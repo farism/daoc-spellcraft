@@ -1,0 +1,1 @@
+Templates = new Meteor.Collection('templates');
