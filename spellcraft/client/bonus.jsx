@@ -4,66 +4,68 @@ Bonus = ReactMeteor.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 
-  getMeteorState: function(){
-    var slots = Session.get('slots') || [];
-    var slot = slots[this.props.slot] || [];
-    var bonus = slot[this.props.index] || { type: '', effect: '', value: '' };
-    return bonus;
+  getInitialState: function() {
+    return {
+      imbue: 0
+    };
   },
 
-  getDefaultProps: function(){
-    return { crafted: 0 }
+  getMeteorState: function() {
+    return Bonuses.findOne({ slot: this.props.slot.id, index: this.props.index });
+  },
+
+  componentDidUpdate: function(prevProps, prevState) {
+    Bonuses.update({ slot: this.props.slot.id, index: this.props.index }, { $set: _.omit(this.state, '_id') });
   },
 
   render: function() {
     return (
       <div className="bonus">
-        {this.typeSelect()}
-        {this.effectSelect()}
-        {this.valueSelect()}
+
+        <select name="type" value={this.state.type} onChange={this.onChangeType}>
+          <option>-type-</option>
+          {(this.props.slot.crafted ? CraftedBonusTypes : BonusTypes).map(function(type, i) {
+            return <option value={type} key={i}>{type}</option>;
+          }.bind(this))}
+        </select>
+
+        <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
+          <option>-effect-</option>
+          {(BonusEffectsMap[this.state.type] || []).map(function(effect, i) {
+            return <option value={effect} key={i}>{effect}</option>;
+          }.bind(this))}
+        </select>
+
+        {this.props.slot.crafted ? (
+          <select name="amount" value={this.state.amount} onChange={this.onChangeAmount}>
+            <option>-value-</option>
+            {(CraftedBonusTypeValues[this.state.type] || []).map(function(value, i) {
+              return <option value={value} key={i}>{value}</option>
+            }.bind(this))}
+          </select>
+        ) : (
+          <input name="amount" value={this.state.amount} onChange={this.onChangeAmount} />
+        )}
+
+        {!this.props.slot.crafted ? '' : (
+          <span>{this.props.imbue}</span>
+        )}
       </div>
     );
   },
 
-  typeSelect: function() {
-    return (
-      <select name="type" value={this.state.type} onChange={this.onChange}>
-        <option>-type-</option>
-        {BonusTypes.map(function(type, i) {
-          return <option value={type} key={i}>{type}</option>;
-        }.bind(this))}
-      </select>
-    );
+  onChangeType: function(e){
+    this.setState({ type: $(e.target).val(), effect: '', amount: '', imbue: 0 });
   },
 
-  effectSelect: function() {
-    return (
-      <select name="effect" value={this.state.effect} onChange={this.onChange}>
-        <option>-effect-</option>
-        {(BonusEffectsMap[this.state.type] || []).map(function(effect, i) {
-          return <option value={effect} key={i}>{effect}</option>;
-        }.bind(this))}
-      </select>
-    );
+  onChangeEffect: function(e){
+    this.setState({ effect: $(e.target).val() });
   },
 
-  valueSelect: function() {
-    return this.props.crafted ? (
-      <select name="value" value={this.state.value} onChange={this.onChange}>
-        <option>-value-</option>
-        {(CraftedBonusTypeValues.map[this.state.type] || []).map(function(value, i) {
-          return <option value={value} key={i}>{value}</option>
-        }.bind(this))}
-      </select>
-    ) : (
-      <input name="value" onChange={this.onChange} />
-    );
-  },
-
-  onChange: function(e) {
-    var state = this.state;
-    state[$(e.target).attr('name')] = $(e.target).val();
-    this.setState(state);
+  onChangeAmount: function(e){
+    var amount = parseInt($(e.target).val()) || 0;
+    var imbue = CalculateBonusImbue(this.state.type, this.state.effect, amount);
+    this.setState({ amount: amount, imbue: imbue });
   }
 
 });
