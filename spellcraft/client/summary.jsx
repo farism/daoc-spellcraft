@@ -11,12 +11,13 @@ Summary = ReactMeteor.createClass({
   },
 
   getMeteorState: function() {
+    var state = Session.get('meta');
     var bonuses = Bonuses.find().fetch();
     var stats = this.getBonusTotal('Stat', BonusStat, bonuses);
     var statcaps = this.getBonusTotal('Cap Increase', BonusStatCap, bonuses);
     var resists = this.getBonusTotal('Resist', BonusResist, bonuses);
     var other = this.getBonusTotal('Other Bonus', BonusOther, bonuses);
-    return _.extend({}, stats, statcaps, resists, other);
+    return _.extend(state, stats, statcaps, resists, other);
   },
 
   render: function() {
@@ -28,25 +29,32 @@ Summary = ReactMeteor.createClass({
 
         <label><input type="checkbox" checkedLink={this.linkState('fromCeiling')} /> Distance from cap</label>
 
-        {BonusStat.map(function(effect, i){
-          return (effect != 'Acuity' && (castStats.indexOf(effect) < 0 || castStat == effect)) ? (
-            <div key={i}>
-              <label>{effect.substr(0,3)}: </label>
-              <span>{this.getBonusDisplay('Stat', effect)}</span>
-              <span>({this.getBonusDisplay('Cap Increase', effect)})</span>
-            </div>
-          ) : '';
-        }.bind(this))}
-
-        {BonusResist.map(function(effect, i){
-          return (
-            <div key={i}>
-              <label>{effect}: </label>
-              <span>{this.getBonusDisplay('Resist', effect)}</span>
-              <span></span>
-            </div>
-          );
-        }.bind(this))}
+        <table>
+          <tr>
+            <td>
+              {BonusStat.map(function(effect, i){
+                return (effect != 'Acuity' && (castStats.indexOf(effect) < 0 || castStat == effect)) ? (
+                  <div key={i}>
+                    <label>{effect.substr(0,3)}: </label>
+                    <span>{this.getBonusDisplay('Stat', effect)}</span>
+                    <span>({this.getBonusDisplay('Cap Increase', effect)})</span>
+                  </div>
+                ) : '';
+              }.bind(this))}
+            </td>
+            <td>
+              {BonusResist.map(function(effect, i){
+                return (
+                  <div key={i}>
+                    <label>{effect}: </label>
+                    <span>{this.getBonusDisplay('Resist', effect)}</span>
+                    <span>{GetRacialResist(this.state.realm, this.state.race, effect)}</span>
+                  </div>
+                );
+              }.bind(this))}
+            </td>
+          </tr>
+        </table>
 
         {BonusOther.map(function(effect, i){
           return !this.state[effect] ? '' : (
@@ -75,7 +83,7 @@ Summary = ReactMeteor.createClass({
 
       state[effect + ' ' + type] = amount;
     });
-    
+
     return state;
   },
 

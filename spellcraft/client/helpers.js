@@ -31,17 +31,22 @@ GetRacesByClass = function(realm, clss){
   return classRaces.map(function(index){ return races[index] });
 };
 
-GetResistsByRace = function(realm, race){
+GetRacialResist = function(realm, race, effect){
   var races = _.findWhere(Realms, { name: realm }).races;
   var resists = _.findWhere(races, { name: race }).resists;
-  return resists;
+  return resists[effect] ? '+' + resists[effect] : '';
+};
+
+GetSkillGems = function(realm, race){
+  return (_.findWhere(Realms, { name: realm }) || {}).classes || [];
 };
 
 GetImbueCeiling = function(level){
-  return ImbueTotals[parseInt(level, 10) - 1].toFixed(1);
+  return ImbueTotals[parseInt(level, 10) - 1];
 };
 
 CalculateBonusImbue = function(type, effect, amount){
+  amount = parseInt(amount, 10) || 0;
   var imbue = 0;
 
   if(type == 'Stat'){
@@ -58,7 +63,7 @@ CalculateBonusImbue = function(type, effect, amount){
     imbue = (amount - 1) * 5;
   }
 
-  return imbue;
+  return Math.max(amount == 0 ? 0 : 1, imbue);
 }
 
 CalculateCap = function(type, level){

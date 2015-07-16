@@ -20,6 +20,8 @@ AllSlots.map(function(slot){
     craftedItemName: 'Crafted',
     equipped: true,
     level: 51,
+    imbueArr: [0,0,0,0],
+    imbuePoints: 0,
     imbueTotal: 32
   });
 
@@ -30,6 +32,7 @@ AllSlots.map(function(slot){
       type: '',
       effect: '',
       amount: 0,
+      imbue: 0,
       gem: ''
     });
   });

@@ -4,14 +4,28 @@ Bonus = ReactMeteor.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 
-  getInitialState: function() {
+  getDefaultProps: function() {
     return {
       imbue: 0
+    }
+  },
+
+  getInitialState: function() {
+    return {
+      imbue: 0,
+      error: false
     };
   },
 
   getMeteorState: function() {
-    return Bonuses.findOne({ slot: this.props.slot.id, index: this.props.index });
+    var state = Bonuses.findOne({ slot: this.props.slot.id, index: this.props.index });
+    state.error = false;
+
+    if(this.state.type && this.state.effect){
+      state.error = Bonuses.find({ slot: this.props.slot.id, type: this.state.type, effect: this.state.effect }).count() > 1;
+    }
+
+    return state;
   },
 
   componentDidUpdate: function(prevProps, prevState) {
@@ -20,17 +34,17 @@ Bonus = ReactMeteor.createClass({
 
   render: function() {
     return (
-      <div className="bonus">
+      <div className={classNames({ bonus: 1, error: this.state.error })}>
 
         <select name="type" value={this.state.type} onChange={this.onChangeType}>
-          <option>-type-</option>
+          <option value="">-type-</option>
           {(this.props.slot.crafted ? CraftedBonusTypes : BonusTypes).map(function(type, i) {
             return <option value={type} key={i}>{type}</option>;
           }.bind(this))}
         </select>
 
         <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
-          <option>-effect-</option>
+          <option value="">-effect-</option>
           {(BonusEffectsMap[this.state.type] || []).map(function(effect, i) {
             return <option value={effect} key={i}>{effect}</option>;
           }.bind(this))}
@@ -38,7 +52,7 @@ Bonus = ReactMeteor.createClass({
 
         {this.props.slot.crafted ? (
           <select name="amount" value={this.state.amount} onChange={this.onChangeAmount}>
-            <option>-value-</option>
+            <option value="">-value-</option>
             {(CraftedBonusTypeValues[this.state.type] || []).map(function(value, i) {
               return <option value={value} key={i}>{value}</option>
             }.bind(this))}
@@ -48,7 +62,7 @@ Bonus = ReactMeteor.createClass({
         )}
 
         {!this.props.slot.crafted ? '' : (
-          <span>{this.props.imbue}</span>
+          <span>{this.props.imbue.toFixed(1)}</span>
         )}
       </div>
     );
@@ -59,13 +73,17 @@ Bonus = ReactMeteor.createClass({
   },
 
   onChangeEffect: function(e){
-    this.setState({ effect: $(e.target).val() });
+    var state = {};
+    state.effect = $(e.target).val();
+    if(!state.effect){
+      state.amount = 0;
+    }
+    this.setState(state);
   },
 
   onChangeAmount: function(e){
     var amount = parseInt($(e.target).val()) || 0;
-    var imbue = CalculateBonusImbue(this.state.type, this.state.effect, amount);
-    this.setState({ amount: amount, imbue: imbue });
+    this.setState({ amount: amount });
   }
 
 });
