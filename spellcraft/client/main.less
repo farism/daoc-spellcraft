@@ -1,0 +1,67 @@
+.clearfix() {
+  &:before, &:after { content: " "; display: table; }
+  &:after { clear: both; }
+}
+
+.summary { font-size:11px; line-height:12px;
+  td { vertical-align:top; }
+  .stats {
+    label { display:inline-block; width:40px; }
+    div > span { display:inline-block; width:25px; }
+  }
+  .resists { padding-left:10px;
+    label { display:inline-block; width:50px; }
+    div > span + span { margin-left:5px; color:#999; }
+  }
+}
+
+.tabs { .clearfix();
+  button { float:left; }
+  .break { clear:both; }
+}
+
+.bonus {
+  &.error {
+    select, input { border-color:#f00; }
+  }
+  .imbue { display:inline-block; width:60px; padding:0 15px; }
+}
+
+.enhanced-modal {
+  td { border:1px solid #000; }
+  tr { cursor:pointer; user-select:none; }
+  .selected { background:#000; color:#fff; }
+}
+
+.report-modal {
+  label { margin-right:20px; 
+    input { margin-right:10px; }
+  }
+  p { margin:0; }
+}
+
+.select2-container { width:300px;
+  .select2-choice { border-radius:0; background:none!important;
+    .select2-arrow { border-radius:0; border:0; background:none!important; }
+  }
+}
+
+.select2-search { padding:4px;
+  input { margin:0!important; width:100%!important; background:none!important; }
+}
+
+.select2-container-active {
+  .select2-choice, .select2-choices { border:1px solid #aaa; }
+}
+
+.select2-drop { border-radius:0; font-size:12px; }
+
+.select2-drop-active { border:1px solid #aaa; }
+
+select, input[type="text"], input[type="number"], .select2-container { display:inline-block; margin:5px; height:26px; line-height:26px; }
+input[type="checkbox"] { margin-right:10px; }
+input[type="text"], input[type="number"] { padding:0 5px; }
+input[type="number"] { line-height:20px; }
+select[name="type"] { width:150px; }
+select[name="effect"] { width:250px; }
+input[name="amount"], select[name="amount"] { width:150px; }

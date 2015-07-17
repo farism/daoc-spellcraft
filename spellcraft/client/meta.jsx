@@ -25,8 +25,8 @@ Meta = ReactMeteor.createClass({
         </select>
 
         <select value={this.state.class} onChange={this.onChangeClass}>
-          {GetClassesByRealm(this.state.realm).map(function(realm, i){
-            return <option value={realm.name} key={i}>{realm.name}</option>
+          {GetClassesByRealm(this.state.realm).map(function(clss, i){
+            return <option value={clss.name} key={i}>{clss.name}</option>
           })}
         </select>
 
@@ -37,8 +37,6 @@ Meta = ReactMeteor.createClass({
         </select>
 
         <input type="number" min="1" max="50" maxLength="2" valueLink={this.linkState('level')} />
-
-        <input type="text" valueLink={this.linkState('name')} />
 
       </div>
     );
@@ -55,7 +53,7 @@ Meta = ReactMeteor.createClass({
   onChangeClass: function(e) {
     var state = {};
     state.class = $(e.target).val();
-    state.race = GetClassesByRealm(this.state.realm, state.class)[0];
+    state.race = GetRacesByClass(this.state.realm, state.class)[0].name;
     this.setState(state);
   },
 

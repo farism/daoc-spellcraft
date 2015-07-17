@@ -14,7 +14,7 @@ Session.set('meta', {
 AllSlots.map(function(slot){
   Slots.insert({
     id: slot.id,
-    slot: slot.value,
+    name: slot.name,
     crafted: slot.id >= 9,
     itemName: '',
     craftedItemName: 'Crafted',
@@ -53,20 +53,35 @@ App = ReactMeteor.createClass({
       <div className="app">
         <Meta />
         <Summary />
-        {Slots.find().map(function(slot, i){
-          return <button onClick={this.onClickSlot.bind(this, i)} key={i}>{slot.slot}</button>;
-        }.bind(this))}
-        {Slots.find().map(function(slot, i){
-          if(slot.id == this.state.active){
-            return <Slot id={slot.id} key={i} />;
-          }
-        }.bind(this))}
+        <button onClick={this.onClickReport}>Report</button>
+        <div className="tabs">
+          {Slots.find().map(function(slot, i){
+            return <button className={i == 9 ? 'break' : ''} onClick={this.onClickSlot.bind(this, i)} key={i}>{slot.name}</button>;
+          }.bind(this))}
+        </div>
+        <div className="slots">
+          {Slots.find().map(function(slot, i){
+            if(slot.id == this.state.active){
+              return <Slot id={slot.id} onClickEnhancedBonus={this.onClickEnhancedBonus} key={i} />;
+            }
+          }.bind(this))}
+        </div>
+        <ReportModal ref="report" />
+        <EnhancedModal ref="enhancedbonus" slot={this.state.active} />
       </div>
     );
   },
 
   onClickSlot: function(i) {
     this.setState({ active: i });
-  }
+  },
+
+  onClickReport: function() {
+    this.refs.report.show();
+  },
+
+  onClickEnhancedBonus: function(slot) {
+    this.refs.enhancedbonus.show();
+  },
 
 });

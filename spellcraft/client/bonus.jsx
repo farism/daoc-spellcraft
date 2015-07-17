@@ -33,37 +33,44 @@ Bonus = ReactMeteor.createClass({
   },
 
   render: function() {
+    var realm = Session.get('meta').realm;
+    var clss = Session.get('meta').class;
+    var effects = this.state.type == 'Skill' ? GetSkillEffects(realm, clss) : BonusEffectsMap[this.state.type];
+    var amounts = CraftedBonusTypeValues[this.state.effect] || CraftedBonusTypeValues[this.state.type];
+
     return (
       <div className={classNames({ bonus: 1, error: this.state.error })}>
 
         <select name="type" value={this.state.type} onChange={this.onChangeType}>
           <option value="">-type-</option>
-          {(this.props.slot.crafted ? CraftedBonusTypes : BonusTypes).map(function(type, i) {
+          {BonusTypes.map(function(type, i) {
             return <option value={type} key={i}>{type}</option>;
           }.bind(this))}
         </select>
 
         <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
           <option value="">-effect-</option>
-          {(BonusEffectsMap[this.state.type] || []).map(function(effect, i) {
-            return <option value={effect} key={i}>{effect}</option>;
+          {(effects || []).map(function(effect, i) {
+            return !(this.props.slot.crafted && effect == 'Acuity') ? <option value={effect} key={i}>{effect}</option> : '';
           }.bind(this))}
         </select>
 
         {this.props.slot.crafted ? (
           <select name="amount" value={this.state.amount} onChange={this.onChangeAmount}>
             <option value="">-value-</option>
-            {(CraftedBonusTypeValues[this.state.type] || []).map(function(value, i) {
+            {(amounts || []).map(function(value, i) {
               return <option value={value} key={i}>{value}</option>
             }.bind(this))}
           </select>
         ) : (
-          <input name="amount" value={this.state.amount} onChange={this.onChangeAmount} />
+          <input type="text" name="amount" maxLength="2" value={this.state.amount} onChange={this.onChangeAmount} />
         )}
 
         {!this.props.slot.crafted ? '' : (
-          <span>{this.props.imbue.toFixed(1)}</span>
+          <span className="imbue">{this.props.imbue.toFixed(1)}</span>
         )}
+
+        {GetGemName(this.state.type, this.state.effect, this.state.amountIndex)}
       </div>
     );
   },
@@ -83,7 +90,8 @@ Bonus = ReactMeteor.createClass({
 
   onChangeAmount: function(e){
     var amount = parseInt($(e.target).val()) || 0;
-    this.setState({ amount: amount });
+    var amountIndex = $(e.target).prop('selectedIndex');
+    this.setState({ amount: amount, amountIndex: amountIndex });
   }
 
 });

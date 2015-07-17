@@ -24,6 +24,12 @@ GetCastStatByClass = function(realm, clss){
   return castStat;
 };
 
+GetArmorTierByClass = function(realm, clss){
+  var classes = (_.findWhere(Realms, { name: realm }) || {}).classes || [];
+  var armorTier = (_.findWhere(classes, { name: clss }) || {}).armor || 0;
+  return armorTier;
+};
+
 GetRacesByClass = function(realm, clss){
   var races = GetRacesByRealm(realm);
   var classes = (_.findWhere(Realms, { name: realm }) || {}).classes || [];
@@ -37,8 +43,55 @@ GetRacialResist = function(realm, race, effect){
   return resists[effect] ? '+' + resists[effect] : '';
 };
 
-GetSkillGems = function(realm, race){
-  return (_.findWhere(Realms, { name: realm }) || {}).classes || [];
+GetEnhancedBonusesBySlot = function(realm, clss, slot){
+  var gear = [];
+  var armorTier = GetArmorTierByClass(realm, clss);
+  if(IsArmorSlot(slot)){
+    gear = _.findWhere(Realms, { name: realm }).fifthSlotArmor;
+    var gear = _.flatten(gear.slice(0, armorTier + 1), true).map(function(item){
+      return item[slot - 8] ? { name: item[0], value: item[slot - 8] } : null;
+    });
+  } else {
+    gear = _.findWhere(Realms, { name: realm }).fifthSlotWeapon;
+    gear = _.flatten(gear, true).map(function(item){
+      return { name: item[0], value: item[1] };
+    });
+  }
+
+  return _.compact(gear);
+};
+
+GetGemName = function(type, effect, index, arr){
+  var gem = [GemLevels[index - 1]];
+
+  if(type == 'Stat'){
+    gem[1] = StatPrefixMap[effect];
+    gem[2] = 'Essence Jewel';
+  } else if(type == 'Resist'){
+    gem[1] = ResistPrefixMap[effect]; 
+    gem[2] = 'Shielding Jewel';
+  } else if(type == 'Skill'){
+    var skill = _.findWhere(SkillGems, { name: effect });
+    if(skill){
+      gem[1] = skill.gems[0];
+      gem[2] = skill.gems[1];
+    }
+  }
+
+  gem = _.compact(gem);
+
+  return gem.length == 3 ? (arr ? gem : gem.join(' ')) : '';
+};
+
+GetSkillEffects = function(realm, clss){
+  var classes = GetClassesByRealm(realm).map(function(clss){ return clss.name });
+  var classIndex = classes.indexOf(clss);
+  var gems = _.where(SkillGems, { realm: realm });
+  return gems.filter(function(gem){
+    return gem.classes.indexOf(classIndex) >= 0;
+  }).map(function(gem){
+    return gem.name;
+  });
 };
 
 GetImbueCeiling = function(level){
@@ -64,56 +117,4 @@ CalculateBonusImbue = function(type, effect, amount){
   }
 
   return Math.max(amount == 0 ? 0 : 1, imbue);
-}
-
-CalculateCap = function(type, level){
-  return {
-    'Strength': Math.floor(level * 1.5),
-    'Constitution': Math.floor(level * 1.5),
-    'Dexterity': Math.floor(level * 1.5),
-    'Quickness': Math.floor(level * 1.5),
-    'Intelligence': Math.floor(level * 1.5),
-    'Piety': Math.floor(level * 1.5),
-    'Empathy': Math.floor(level * 1.5),
-    'Acuity': Math.floor(level * 1.5),
-    'Hits': level * 4,
-    'Power': Math.floor(level / 2),
-    'Strength Cap Increase': Math.floor(level / 2 + 1),
-    'Constitution Cap Increase': Math.floor(level / 2 + 1),
-    'Dexterity Cap Increase': Math.floor(level / 2 + 1),
-    'Quickness Cap Increase': Math.floor(level / 2 + 1),
-    'Intelligence Cap Increase': Math.floor(level / 2 + 1),
-    'Piety Cap Increase': Math.floor(level / 2 + 1),
-    'Empathy Cap Increase': Math.floor(level / 2 + 1),
-    'Acuity Cap Increase': Math.floor(level / 2 + 1),
-    'Hits Cap Increase': Math.floor(level / 2 + 1),
-    'Body': Math.floor(level / 2 + 1),
-    'Cold': Math.floor(level / 2 + 1),
-    'Heat': Math.floor(level / 2 + 1),
-    'Energy': Math.floor(level / 2 + 1),
-    'Matter': Math.floor(level / 2 + 1),
-    'Spirit': Math.floor(level / 2 + 1),
-    'Crush': Math.floor(level / 2 + 1),
-    'Thrust': Math.floor(level / 2 + 1),
-    'Slash': Math.floor(level / 2 + 1),
-    'Skill': Math.floor(level / 5 + 1),
-    'Archery and Casting Speed': Math.floor(level / 5),
-    'Archery and Spell Range': Math.floor(level / 5),
-    'Archery and Spell Damage': Math.floor(level / 5),
-    'Melee Combat Speed': Math.floor(level / 5),
-    'Melee Damage': Math.floor(level / 5),
-    'Style Damage': Math.floor(level / 5),
-    'Resist Pierce': Math.floor(level / 5),
-    'Power Pool %': Math.floor(level / 2),
-    'Power Pool % Cap Increase': level,
-    'Stat Buff Effectiveness': Math.floor(level / 2),
-    'Stat Debuff Effectiveness': Math.floor(level / 2),
-    'Healing Effectiveness': Math.floor(level / 2),
-    'Duration of Spells': Math.floor(level / 2),
-    '% Power Pool': Math.floor(level / 2),
-    '% Power Pool Cap Increase': Math.floor(level / 2),
-    'Fatigue': Math.floor(level / 2),
-    'Fatigue Cap Increase': Math.floor(level / 2),
-    'AF': level
-  }[type] || 0;
 }

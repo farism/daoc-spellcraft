@@ -4,10 +4,17 @@ Slot = ReactMeteor.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 
+  getInitialState: function() {
+    return {
+      query: [],
+      enhanced: false
+    }
+  },
+
   getMeteorState: function() {
     var state = Slots.findOne({ id: this.props.id });
 
-    state.imbueArr = Bonuses.find({ slot: this.props.id }).fetch().map(function(bonus){
+    state.imbueArr = Bonuses.find({ slot: this.props.id }).fetch().slice(0, 4).map(function(bonus){
       return CalculateBonusImbue(bonus.type, bonus.effect, bonus.amount) / 2;
     });
 
@@ -16,9 +23,13 @@ Slot = ReactMeteor.createClass({
 
     state.imbuePoints = state.imbueArr.reduce(function(prev, cur){
       return prev + cur;
-    });
+    }, 0);
 
     return state;
+  },
+
+  componentDidMount: function(){
+    $(React.findDOMNode(this.refs.search)).select2({ query: this.query, format:this.format });
   },
 
   componentDidUpdate: function(prevProps, prevState) {
@@ -31,7 +42,7 @@ Slot = ReactMeteor.createClass({
     }
   },
 
-  render: function(){
+  render: function() {
     return (
       <div className="slot">
 
@@ -39,8 +50,14 @@ Slot = ReactMeteor.createClass({
           <label><input type="checkbox" name="crafted" checkedLink={this.linkState('crafted')} />Crafted</label>
         )}
 
+        {this.props.id < 15 ? '' : (
+          <label><input type="checkbox" name="equiped" checkedLink={this.linkState('equipped')} />Equipped</label>
+        )}
+
+        <br />
+
         {this.state.crafted ? '' : (
-          <input type="text" valueLink={this.linkState('itemName')} />
+          <input ref="search" type="text" />
         )}
 
         {!this.state.crafted ? '' : (
@@ -52,19 +69,39 @@ Slot = ReactMeteor.createClass({
         )}
 
         {_.range(0, this.state.crafted ? 4 : 10).map(function(val, i){
-          return <Bonus ref={'bonus' + i} slot={this.state} index={i} imbue={this.state.imbueArr[i]} key={i} />;
+          return <Bonus ref={'bonus' + i} slot={this.state} imbue={this.state.imbueArr[i]} enhanced={this.state.crafted && i == 4} index={i} key={i} />;
         }.bind(this))}
 
-        {!this.state.crafted || this.state.hasFifthSlot ? '' : (
-          <button onClick={this.selectFifthSlot}>Enhanced Bonus</button>
+        {!this.state.crafted || !this.state.enhanced ? '' : (
+          <EnhancedBonus ref="bonus4" slot={this.state} index={4} />
+        )}
+
+        {!this.state.crafted ? '' : (
+          <button onClick={this.onClickEnhanced}>Enhanced Bonus</button>
         )}
 
       </div>
     );
   },
 
-  selectFifthSlot: function(e) {
+  query: function(search) {
+    if(search.term.length > 2){
+      var results = Items.find({ itemname: new RegExp(search.term, 'gi') }).fetch().map(function(item){
+        return { id: item._id, text: item.itemname };
+      });
 
+      search.callback({ results: results });
+    } else {
+      search.callback({ results: [] });
+    }
+  },
+
+  format: function(item){
+    return item.itemname;
+  },
+
+  onClickEnhanced: function(e) {
+    this.props.onClickEnhancedBonus(this);
   }
 
 });

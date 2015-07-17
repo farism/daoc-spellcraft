@@ -13,7 +13,9 @@ CraftedBonusTypeValues = {
   'Resist': [1, 2, 3, 5, 7, 9, 11, 13, 15, 17],
   'Power':  [1, 2, 3, 5, 7, 9, 11, 13, 15, 17],
   'Focus':  [5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
-  'Skill':  [1, 2, 3, 4, 5, 6, 7, 8]
+  'Skill':  [1, 2, 3, 4, 5, 6, 7, 8],
+  'Other Bonus':  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  'Cap Increase':  [1, 2, 3, 4, 5]
 };
 
 CraftedBonusTypes = [
@@ -80,10 +82,11 @@ BonusStatCap = [
   'Constitution',
   'Dexterity',
   'Quickness',
+  'Acuity',
+  'Charisma',
   'Intelligence',
   'Piety',
   'Empathy',
-  'Acuity',
   'Hits',
   'Power'
 ];
@@ -149,31 +152,31 @@ UtilityToA = {
 };
 
 JewelSlots = [
-  { id: 0, value: 'Neck' },
-  { id: 1, value: 'Cloak' },
-  { id: 2, value: 'Jewel' },
-  { id: 3, value: 'Belt' },
-  { id: 4, value: 'Ring' },
-  { id: 5, value: 'Ring' },
-  { id: 6, value: 'Wrist' },
-  { id: 7, value: 'Wrist' },
-  { id: 8, value: 'Mythical' }
+  { id: 0, name: 'Neck' },
+  { id: 1, name: 'Cloak' },
+  { id: 2, name: 'Jewel' },
+  { id: 3, name: 'Belt' },
+  { id: 4, name: 'Ring' },
+  { id: 5, name: 'Ring' },
+  { id: 6, name: 'Wrist' },
+  { id: 7, name: 'Wrist' },
+  { id: 8, name: 'Mythical' }
 ];
 
 ArmorSlots = [
-  { id: 9, value: 'Chest' },
-  { id: 10, value: 'Head' },
-  { id: 11, value: 'Arms' },
-  { id: 12, value: 'Legs' },
-  { id: 13, value: 'Hands' },
-  { id: 14, value: 'Feet' }
+  { id: 9, name: 'Chest' },
+  { id: 10, name: 'Head' },
+  { id: 11, name: 'Arms' },
+  { id: 12, name: 'Legs' },
+  { id: 13, name: 'Hands' },
+  { id: 14, name: 'Feet' }
 ];
 
 WeaponSlots = [
-  { id: 15, value: 'Right Hand' },
-  { id: 16, value: 'Left Hand' },
-  { id: 17, value: '2 Handed' },
-  { id: 18, value: 'Ranged' }
+  { id: 15, name: 'Right Hand' },
+  { id: 16, name: 'Left Hand' },
+  { id: 17, name: '2 Handed' },
+  { id: 18, name: 'Ranged' }
 ];
 
 ShieldTypes = [
