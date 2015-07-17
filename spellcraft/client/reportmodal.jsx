@@ -2,10 +2,13 @@ ReportModal = ReactMeteor.createClass({
 
   templateName: 'ReportModal',
 
+  mixins: [React.addons.LinkedStateMixin],
+
   getInitialState: function() {
     return {
       style: 0,
-      visible: false
+      visible: false,
+      expand: false
     }
   },
 
@@ -27,15 +30,16 @@ ReportModal = ReactMeteor.createClass({
               <label><input type="radio" name="style" value="1" checked={this.state.style == 1} onChange={this.onChangeStyle} />LOKI</label>
               <label><input type="radio" name="style" value="2" checked={this.state.style == 2} onChange={this.onChangeStyle} />Korts</label>
               <ul className="nav nav-tabs">
-                <li className="active"><a href="#item" data-toggle="tab">Item Report</a></li>
-                <li><a href="#craft" data-toggle="tab">Craft Report</a></li>
+                <li><a href="#item" data-toggle="tab">Item Report</a></li>
+                <li className="active"><a href="#craft" data-toggle="tab">Craft Report</a></li>
               </ul>
               <div className="tab-content">
-                <div className="tab-pane active" id="item">
+                <div className="tab-pane" id="item">
+                  <label><input type="checkbox" checkedLink={this.linkState('expand')}/>Expand dropped bonuses</label>
                   {this.displayReport()}
                 </div>
-                <div className="tab-pane" id="craft">
-                  
+                <div className="tab-pane active" id="craft">
+                  {this.displayReportCrafting()}
                 </div>
               </div>
             </div>
@@ -66,15 +70,21 @@ ReportModal = ReactMeteor.createClass({
   displayReport: function() {
     if(this.state.visible){
       if(this.state.style == 0){
-        return <ReportGearBunny />
+        return <ReportGearBunny expand={this.state.expand} />
       } else if(this.state.style == 1){
-        return <ReportLoki />
+        return <ReportLoki expand={this.state.expand} />
       } else if(this.state.style == 2){
-        return <ReportKorts />
+        return <ReportKorts expand={this.state.expand} />
       }
     }
 
     return '';
+  },
+
+  displayReportCrafting: function(){
+    if(this.state.visible){
+      return <ReportCrafting />
+    }
   }
 
 });

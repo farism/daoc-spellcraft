@@ -37,7 +37,7 @@ Slot = ReactMeteor.createClass({
 
     if(prevState.crafted != this.state.crafted){
       for(var ref in this.refs){
-        this.refs[ref].setState({ type: '', effect: '', amount: 0, imbue: 0 });
+        this.refs[ref].setState({ type: '', effect: '', amount: 0, amountIndex: 0, imbue: 0 });
       }
     }
   },
@@ -46,39 +46,43 @@ Slot = ReactMeteor.createClass({
     return (
       <div className="slot">
 
-        {this.props.id < 9 ? '' : (
+        {this.props.id > 9 ? (
           <label><input type="checkbox" name="crafted" checkedLink={this.linkState('crafted')} />Crafted</label>
-        )}
+        ) : ''}
 
-        {this.props.id < 15 ? '' : (
+        {this.props.id > 15 ? (
           <label><input type="checkbox" name="equiped" checkedLink={this.linkState('equipped')} />Equipped</label>
-        )}
+        ) : ''}
 
         <br />
 
-        {this.state.crafted ? '' : (
+        {!this.state.crafted ? (
           <input ref="search" type="text" />
-        )}
+        ) : ''}
 
-        {!this.state.crafted ? '' : (
+        {this.state.crafted ? (
           <input type="number" min="1" max="51" maxLength="2" valueLink={this.linkState('level')} />
-        )}
+        ) : ''}
 
-        {!this.state.crafted ? '' : (
+        {this.state.crafted ? (
           <span>{this.state.imbuePoints.toFixed(1)} / {GetImbueCeiling(this.state.level).toFixed(1)}</span>
-        )}
+        ) : ''}
 
         {_.range(0, this.state.crafted ? 4 : 10).map(function(val, i){
           return <Bonus ref={'bonus' + i} slot={this.state} imbue={this.state.imbueArr[i]} enhanced={this.state.crafted && i == 4} index={i} key={i} />;
         }.bind(this))}
 
-        {!this.state.crafted || !this.state.enhanced ? '' : (
+        {this.state.crafted && this.state.enhanced ? (
           <EnhancedBonus ref="bonus4" slot={this.state} index={4} />
-        )}
+        ) : ''}
 
-        {!this.state.crafted ? '' : (
+        {this.state.crafted ? (
           <button onClick={this.onClickEnhanced}>Enhanced Bonus</button>
-        )}
+        ) : ''}
+
+        {this.state.enhanced ? (
+          <button onClick={this.onClickEnhancedClear}>Clear Enhanced</button>
+        ) : ''}
 
       </div>
     );
@@ -101,7 +105,12 @@ Slot = ReactMeteor.createClass({
   },
 
   onClickEnhanced: function(e) {
-    this.props.onClickEnhancedBonus(this);
+    this.props.onClickEnhanced(this);
+  },
+
+  onClickEnhancedClear: function(){
+    this.refs.bonus4.setState({ type: '', effect: '', amount: 0, amountIndex: 0, imbue: 0 });
+    this.setState({ enhanced: false });
   }
 
 });

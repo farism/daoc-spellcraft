@@ -32,20 +32,28 @@ AllSlots.map(function(slot){
       type: '',
       effect: '',
       amount: 0,
+      amountIndex: 0,
       imbue: 0,
       gem: ''
     });
   });
 });
 
-App = ReactMeteor.createClass({
+Spellcraft = ReactMeteor.createClass({
 
-  templateName: 'App',
+  templateName: 'Spellcraft',
 
   getInitialState: function() {
     return {
       active: 9
     }
+  },
+
+
+  componentDidMount: function() {
+    window.onbeforeunload = function() {
+      return "Data will be lost if you leave the page, are you sure?";
+    };
   },
 
   render: function() {
@@ -62,12 +70,12 @@ App = ReactMeteor.createClass({
         <div className="slots">
           {Slots.find().map(function(slot, i){
             if(slot.id == this.state.active){
-              return <Slot id={slot.id} onClickEnhancedBonus={this.onClickEnhancedBonus} key={i} />;
+              return <Slot id={slot.id} onClickEnhanced={this.onClickEnhanced} key={i} />;
             }
           }.bind(this))}
         </div>
         <ReportModal ref="report" />
-        <EnhancedModal ref="enhancedbonus" slot={this.state.active} />
+        <EnhancedModal ref="enhancedmodal" slot={this.state.active} />
       </div>
     );
   },
@@ -80,8 +88,8 @@ App = ReactMeteor.createClass({
     this.refs.report.show();
   },
 
-  onClickEnhancedBonus: function(slot) {
-    this.refs.enhancedbonus.show();
+  onClickEnhanced: function(slot) {
+    this.refs.enhancedmodal.show();
   },
 
 });

@@ -4,6 +4,12 @@ ReportGearBunny = ReactMeteor.createClass({
 
   mixins: [ReportMixin],
 
+  getDefaultProps: function() {
+    return {
+      expand: false
+    }
+  },
+
   getMeteorState: function() {
     var state = Session.get('meta');
     var slots = Slots.find({ equipped: true }).fetch();
@@ -79,18 +85,6 @@ ReportGearBunny = ReactMeteor.createClass({
         <p>&lt;== End Report ==&gt;</p>
       </div>
     );
-  },
-
-  output: function(type, effect){
-    var amtAndCeil = this.getAmountAndCeiling(type, effect);
-
-    if(amtAndCeil[0]){
-      return (
-        <p>{effect} : {amtAndCeil[0]} / {amtAndCeil[1]}</p>
-      );
-    } else {
-      return '';
-    }
   }
 
 });

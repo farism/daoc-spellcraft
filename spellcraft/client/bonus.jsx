@@ -35,10 +35,11 @@ Bonus = ReactMeteor.createClass({
   render: function() {
     var realm = Session.get('meta').realm;
     var clss = Session.get('meta').class;
-    var effects = this.state.type == 'Skill' ? GetSkillEffects(realm, clss) : BonusEffectsMap[this.state.type];
-    var amounts = CraftedBonusTypeValues[this.state.effect] || CraftedBonusTypeValues[this.state.type];
+    var effects = this.state.type == 'Skill' ? GetSkillEffects(realm, clss) : BonusEffectsMap[this.state.type] || [];
+    var amounts = GetAmounts(this.state.type, this.state.effect);
+    var amount = amounts[this.state.amountIndex - 1] || '';
 
-    return (
+      return (
       <div className={classNames({ bonus: 1, error: this.state.error })}>
 
         <select name="type" value={this.state.type} onChange={this.onChangeType}>
@@ -50,15 +51,15 @@ Bonus = ReactMeteor.createClass({
 
         <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
           <option value="">-effect-</option>
-          {(effects || []).map(function(effect, i) {
+          {effects.map(function(effect, i) {
             return !(this.props.slot.crafted && effect == 'Acuity') ? <option value={effect} key={i}>{effect}</option> : '';
           }.bind(this))}
         </select>
 
         {this.props.slot.crafted ? (
-          <select name="amount" value={this.state.amount} onChange={this.onChangeAmount}>
+          <select name="amount" value={amount} onChange={this.onChangeAmount}>
             <option value="">-value-</option>
-            {(amounts || []).map(function(value, i) {
+            {amounts.map(function(value, i) {
               return <option value={value} key={i}>{value}</option>
             }.bind(this))}
           </select>
@@ -76,22 +77,19 @@ Bonus = ReactMeteor.createClass({
   },
 
   onChangeType: function(e){
-    this.setState({ type: $(e.target).val(), effect: '', amount: '', imbue: 0 });
+    this.setState({ type: $(e.target).val(), effect: '', amount: '', amountIndex: 0, imbue: 0 });
   },
 
   onChangeEffect: function(e){
-    var state = {};
-    state.effect = $(e.target).val();
-    if(!state.effect){
-      state.amount = 0;
+    var effect = $(e.target).val();
+    this.setState({ effect: effect });
+    if(!effect){
+      this.setState({ amount: '', amountIndex: 0, imbue: 0 });
     }
-    this.setState(state);
   },
 
   onChangeAmount: function(e){
-    var amount = parseInt($(e.target).val()) || 0;
-    var amountIndex = $(e.target).prop('selectedIndex');
-    this.setState({ amount: amount, amountIndex: amountIndex });
+    this.setState({ amount: parseInt($(e.target).val(), 10), amountIndex: $(e.target).prop('selectedIndex') });
   }
 
 });

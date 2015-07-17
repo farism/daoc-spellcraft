@@ -598,19 +598,6 @@ Realms = [
 AllClasses = Realms[0].classes.concat(Realms[1].classes).concat(Realms[2].classes);
 AllClasses = _.sortBy(AllClasses, function(c){ return c.name; });
 
-GemLevels = [
-  'Raw',
-  'Uncut',
-  'Rough',
-  'Flawed',
-  'Imperfect',
-  'Polished',
-  'Faceted',
-  'Precious',
-  'Flawless',
-  'Perfect'
-]
-
 StatPrefixMap = {
   'Strength': 'Fiery',
   'Constitution': 'Earthen',
@@ -622,7 +609,7 @@ StatPrefixMap = {
   'Empathy': 'Heated',
   'Power': 'Mystical',
   'Hits': 'Blood'
-}
+};
 
 ResistPrefixMap = {
   'Body': 'Dusty',
@@ -791,7 +778,20 @@ FocusGems = [
   { realm:'Midgard', name: 'Suppression', gems: ['Dust', 'Rune'], classes: [1, 5, 10] }
 ];
 
-Gems = [
+GemLevels = [
+  'Raw',
+  'Uncut',
+  'Rough',
+  'Flawed',
+  'Imperfect',
+  'Polished',
+  'Faceted',
+  'Precious',
+  'Flawless',
+  'Perfect'
+];
+
+GemsOrdered = [
   'Lo',
   'Um',
   'On',
@@ -804,25 +804,25 @@ Gems = [
   'Ra'
 ]
 
-Dusts = [
-  { name: 'Essence Jewel',        mat: 'Essence of Life' },
-  { name: 'Shielding Jewel',      mat: 'Ground Draconic Scales' },
-  { name: 'Spell Stone',          mat: 'Ground Draconic Scales' },
-  { name: 'Sigil',                mat: 'Ground Draconic Scales' },
-  { name: 'Rune',                 mat: 'Ground Draconic Scales' },
-  { name: 'Chaos Rune',           mat: 'Soot From Niflheim' },
-  { name: 'Battle Jewel',         mat: 'Bloodied Battlefield Dirt' },
-  { name: 'War Rune',             mat: 'Ground Giant Bone' },
-  { name: 'Primal Rune',          mat: 'Ground Vendo Bone' },
-  { name: 'Evocation Sigil',      mat: 'Ground Cave Crystal' },
-  { name: 'Fervor Sigil',         mat: 'Ground Blessed Undead Bone' },
-  { name: 'War Sigil',            mat: 'Ground Caer Stone' },
-  { name: 'Nature Spell Stone',   mat: 'Fairy Dust' },
-  { name: 'War Spell Stone',      mat: 'Unseelie Dust' },
-  { name: 'Arcane Spell Stone',   mat: 'Other Worldly Dust' }
-];
+Dusts = {
+  'Essence Jewel': 'Essence of Life',
+  'Shielding Jewel': 'Ground Draconic Scales',
+  'Spell Stone': 'Ground Draconic Scales',
+  'Sigil': 'Ground Draconic Scales',
+  'Rune': 'Ground Draconic Scales',
+  'Chaos Rune': 'Soot From Niflheim',
+  'Battle Jewel': 'Bloodied Battlefield Dirt',
+  'War Rune': 'Ground Giant Bone',
+  'Primal Rune': 'Ground Vendo Bone',
+  'Evocation Sigil': 'Ground Cave Crystal',
+  'Fervor Sigil': 'Ground Blessed Undead Bone',
+  'War Sigil': 'Ground Caer Stone',
+  'Nature Spell Stone': 'Fairy Dust',
+  'War Spell Stone': 'Unseelie Dust',
+  'Arcane Spell Stone': 'Other Worldly Dust'
+};
 
-DustsOrder = [
+DustsOrdered = [
   'Bloodied Battlefield Dirt',
   'Essence of Life',
   'Fairy Dust',
@@ -837,60 +837,60 @@ DustsOrder = [
   'Unseelie Dust'
 ];
 
-Liquids = [
-  { name: 'Fiery',              mat: ['Draconic Fire'] },
-  { name: 'Earthen',            mat: ['Treant Blood'] },
-  { name: 'Vapor',              mat: ['Swamp Fog'] },
-  { name: 'Airy',               mat: ['Air Elemental Essence'] },
-  { name: 'Heated',             mat: ['Heat From an Unearthly Pyre'] },
-  { name: 'Icy',                mat: ['Frost From a Wasteland'] },
-  { name: 'Watery',             mat: ['Leviathan Blood'] },
-  { name: 'Dusty',              mat: ['Undead Ash and Holy Water'] },
-  { name: 'Fire',               mat: ['Draconic Fire'] },
-  { name: 'Earth',              mat: ['Treant Blood'] },
-  { name: 'Vapor',              mat: ['Swamp Fog'] },
-  { name: 'Air',                mat: ['Air Elemental Essence'] },
-  { name: 'Heat',               mat: ['Heat From an Unearthly Pyre'] },
-  { name: 'Ice',                mat: ['Frost From a Wasteland'] },
-  { name: 'Water',              mat: ['Leviathan Blood'] },
-  { name: 'Dust',               mat: ['Undead Ash and Holy Water'] },
-  { name: 'Ashen',              mat: ['Undead Ash and Holy Water'] },
-  { name: 'Vacuous',            mat: ['Swamp Fog'] },
-  { name: 'Salt Crusted',       mat: ['Mystic Energy'] },
-  { name: 'Steaming Spell',     mat: ['Swamp Fog'] },
-  { name: 'Steaming Nature',    mat: ['Swamp Fog'] },
-  { name: 'Steaming Fervor',    mat: ['Heat From an Unearthly Pyre'] },
-  { name: 'Oozing',             mat: ['Treant Blood'] },
-  { name: 'Mineral Encrusted',  mat: ['Heat From an Unearthly Pyre'] },
-  { name: 'Lightning Charged',  mat: ['Leviathan Blood'] },
-  { name: 'Molten Magma',       mat: ['Leviathan Blood'] },
-  { name: 'Light',              mat: ['Sun Light'] },
-  { name: 'Blood',              mat: ['Giant Blood'] },
-  { name: 'Mystical',           mat: ['Mystic Energy'] },
-  { name: 'Mystic',             mat: ['Mystic Energy'] },
-  { name: 'Brilliant',          mat: ['Draconic Fire', 'Mystic Energy', 'Treant Blood'] },
-  { name: 'Finesse',            mat: ['Draconic Fire', 'Mystic Energy', 'Treant Blood'] },
-  { name: 'Ethereal Spell',     mat: ['Swamp Fog'] },
-  { name: 'Phantasmal Spell',   mat: ['Leviathan Blood'] },
-  { name: 'Spectral Spell',     mat: ['Draconic Fire'] },
-  { name: 'Ethereal Arcane',    mat: ['Leviathan Blood'] },
-  { name: 'Phantasmal Arcane',  mat: ['Draconic Fire'] },
-  { name: 'Spectral Arcane',    mat: ['Air Elemental Essence'] },
-  { name: 'Aberrant',           mat: ['Treant Blood'] },
-  { name: 'Embracing',          mat: ['Frost From a Wasteland'] },
-  { name: 'Shadowy',            mat: ['Swamp Fog'] },
-  { name: 'Blighted Primal',    mat: ['Air Elemental Essence'] },
-  { name: 'Blighted Rune',      mat: ['Undead Ash and Holy Water'] },
-  { name: 'Valiant',            mat: ['Swamp Fog'] },
-  { name: 'Unholy',             mat: ['Air Elemental Essence'] },
-  { name: 'Glacial',            mat: ['Frost From a Wasteland'] },
-  { name: 'Cinder',             mat: ['Draconic Fire'] },
-  { name: 'Radiant',            mat: ['Sun Light'] },
-  { name: 'Magnetic',           mat: ['Mystic Energy'] },
-  { name: 'Clout',              mat: ['Giant Blood'] }
-];
+Liquids = {
+  'Fiery': ['Draconic Fire'],
+  'Earthen': ['Treant Blood'],
+  'Vapor': ['Swamp Fog'],
+  'Airy': ['Air Elemental Essence'],
+  'Heated': ['Heat From an Unearthly Pyre'],
+  'Icy': ['Frost From a Wasteland'],
+  'Watery': ['Leviathan Blood'],
+  'Dusty': ['Undead Ash and Holy Water'],
+  'Fire': ['Draconic Fire'],
+  'Earth': ['Treant Blood'],
+  'Vapor': ['Swamp Fog'],
+  'Air': ['Air Elemental Essence'],
+  'Heat': ['Heat From an Unearthly Pyre'],
+  'Ice': ['Frost From a Wasteland'],
+  'Water': ['Leviathan Blood'],
+  'Dust': ['Undead Ash and Holy Water'],
+  'Ashen': ['Undead Ash and Holy Water'],
+  'Vacuous': ['Swamp Fog'],
+  'Salt Crusted': ['Mystic Energy'],
+  'Steaming Spell': ['Swamp Fog'],
+  'Steaming Nature': ['Swamp Fog'],
+  'Steaming Fervor': ['Heat From an Unearthly Pyre'],
+  'Oozing': ['Treant Blood'],
+  'Mineral Encrusted': ['Heat From an Unearthly Pyre'],
+  'Lightning Charged': ['Leviathan Blood'],
+  'Molten Magma': ['Leviathan Blood'],
+  'Light': ['Sun Light'],
+  'Blood': ['Giant Blood'],
+  'Mystical': ['Mystic Energy'],
+  'Mystic': ['Mystic Energy'],
+  'Brilliant': ['Draconic Fire', 'Mystic Energy', 'Treant Blood'],
+  'Finesse': ['Draconic Fire', 'Mystic Energy', 'Treant Blood'],
+  'Ethereal Spell': ['Swamp Fog'],
+  'Phantasmal Spell': ['Leviathan Blood'],
+  'Spectral Spell': ['Draconic Fire'],
+  'Ethereal Arcane': ['Leviathan Blood'],
+  'Phantasmal Arcane': ['Draconic Fire'],
+  'Spectral Arcane': ['Air Elemental Essence'],
+  'Aberrant': ['Treant Blood'],
+  'Embracing': ['Frost From a Wasteland'],
+  'Shadowy': ['Swamp Fog'],
+  'Blighted Primal': ['Air Elemental Essence'],
+  'Blighted Rune': ['Undead Ash and Holy Water'],
+  'Valiant': ['Swamp Fog'],
+  'Unholy': ['Air Elemental Essence'],
+  'Glacial': ['Frost From a Wasteland'],
+  'Cinder': ['Draconic Fire'],
+  'Radiant': ['Sun Light'],
+  'Magnetic': ['Mystic Energy'],
+  'Clout': ['Giant Blood']
+};
 
-LiquidsOrder = [
+LiquidsOrdered = [
   'Air Elemental Essence',
   'Draconic Fire',
   'Frost From a Wasteland',

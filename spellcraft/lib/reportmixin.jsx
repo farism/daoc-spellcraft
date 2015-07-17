@@ -1,5 +1,17 @@
 ReportMixin = {
 
+  output: function(type, effect){
+    var amtAndCeil = this.getAmountAndCeiling(type, effect);
+
+    if(amtAndCeil[0]){
+      return (
+        <p>{effect} : {amtAndCeil[0]} / {amtAndCeil[1]}</p>
+      );
+    } else {
+      return '';
+    }
+  },
+
   getEffectTotals: function(type, effects, bonuses){
     var state = {};
 

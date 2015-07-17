@@ -43,6 +43,10 @@ GetRacialResist = function(realm, race, effect){
   return resists[effect] ? '+' + resists[effect] : '';
 };
 
+GetAmounts = function(type, effect){
+  return (CraftedBonusTypeValues[effect] || CraftedBonusTypeValues[type]) || [];
+};
+
 GetEnhancedBonusesBySlot = function(realm, clss, slot){
   var gear = [];
   var armorTier = GetArmorTierByClass(realm, clss);
@@ -68,7 +72,7 @@ GetGemName = function(type, effect, index, arr){
     gem[1] = StatPrefixMap[effect];
     gem[2] = 'Essence Jewel';
   } else if(type == 'Resist'){
-    gem[1] = ResistPrefixMap[effect]; 
+    gem[1] = ResistPrefixMap[effect];
     gem[2] = 'Shielding Jewel';
   } else if(type == 'Skill'){
     var skill = _.findWhere(SkillGems, { name: effect });
