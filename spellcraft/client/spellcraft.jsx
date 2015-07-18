@@ -12,30 +12,9 @@ Session.set('meta', {
 });
 
 AllSlots.map(function(slot){
-  Slots.insert({
-    id: slot.id,
-    name: slot.name,
-    crafted: slot.id >= 9,
-    itemName: '',
-    craftedItemName: 'Crafted',
-    equipped: true,
-    level: 51,
-    imbueArr: [0,0,0,0],
-    imbuePoints: 0,
-    imbueTotal: 32
-  });
-
+  Slots.insert(GetDefaultSlot(slot));
   _.range(0, 10).map(function(i){
-    Bonuses.insert({
-      slot: slot.id,
-      index: i,
-      type: '',
-      effect: '',
-      amount: 0,
-      amountIndex: 0,
-      imbue: 0,
-      gem: ''
-    });
+    Bonuses.insert(GetDefaultBonus(slot, i));
   });
 });
 
@@ -52,44 +31,72 @@ Spellcraft = ReactMeteor.createClass({
 
   componentDidMount: function() {
     window.onbeforeunload = function() {
-      return "Data will be lost if you leave the page, are you sure?";
+      //return "Data will be lost if you leave the page, are you sure?";
     };
   },
 
   render: function() {
     return (
-      <div className="app">
-        <Meta />
-        <Summary />
-        <button onClick={this.onClickReport}>Report</button>
-        <div className="tabs">
-          {Slots.find().map(function(slot, i){
-            return <button className={i == 9 ? 'break' : ''} onClick={this.onClickSlot.bind(this, i)} key={i}>{slot.name}</button>;
-          }.bind(this))}
-        </div>
-        <div className="slots">
-          {Slots.find().map(function(slot, i){
-            if(slot.id == this.state.active){
-              return <Slot id={slot.id} onClickEnhanced={this.onClickEnhanced} key={i} />;
-            }
-          }.bind(this))}
+      <div id="app">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-sm-3">
+              <div id="actions">
+                <button className="btn btn-default" onClick={this.onClickReport}>Report</button>
+                <button className="btn btn-default" onClick={this.onClickSave}>Save</button>
+              </div>
+              <Meta />
+              <Summary />
+            </div>
+            <div className="col-sm-9">
+              <ul id="tabs" className="nav nav-pills">
+                {JewelSlots.map(function(slot, i){
+                  return (
+                    <li className={this.state.active == slot.id ? 'active' : ''} onClick={this.onClickSlot.bind(this, slot.id)} key={i}>
+                      <a>{slot.name}</a>
+                    </li>
+                  );
+                }.bind(this))}
+                <div className="clear" />
+                {CraftedSlots.map(function(slot, i){
+                  return (
+                    <li className={this.state.active == slot.id ? 'active' : ''} onClick={this.onClickSlot.bind(this, slot.id)} key={i}>
+                      <a>{slot.name}</a>
+                    </li>
+                  );
+                }.bind(this))}
+              </ul>
+              <br/>
+              <div id="slots">
+                {Slots.find().map(function(slot, i){
+                  if(slot.id == this.state.active){
+                    return <Slot id={slot.id} onClickEnhanceItem={this.onClickEnhanceItem} key={i} />;
+                  }
+                }.bind(this))}
+              </div>
+            </div>
+          </div>
         </div>
         <ReportModal ref="report" />
-        <EnhancedModal ref="enhancedmodal" slot={this.state.active} />
+        <EnhancedModal ref="enhance" slot={this.state.active} />
       </div>
     );
-  },
-
-  onClickSlot: function(i) {
-    this.setState({ active: i });
   },
 
   onClickReport: function() {
     this.refs.report.show();
   },
 
-  onClickEnhanced: function(slot) {
-    this.refs.enhancedmodal.show();
+  onClickSave: function(e) {
+
+  },
+
+  onClickSlot: function(id) {
+    this.setState({ active: id });
+  },
+
+  onClickEnhanceItem: function(slot) {
+    this.refs.enhance.show();
   },
 
 });

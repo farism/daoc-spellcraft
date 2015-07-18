@@ -68,16 +68,16 @@ ReportCrafting = ReactMeteor.createClass({
           }
         })}
         <p><b>Materials</b></p>
-        {GemsOrdered.map(function(g) {
-          return this.state.gems[g] ? <p>{this.state.gems[g]} {g}</p> : '';
+        {GemsOrdered.map(function(g, i) {
+          return this.state.gems[g] ? <p key={i}>{this.state.gems[g]} {g}</p> : '';
         }.bind(this))}
         <br/>
-        {DustsOrdered.map(function(d) {
-          return this.state.dusts[d] ? <p>{this.state.dusts[d]} {d}</p> : '';
+        {DustsOrdered.map(function(d, i) {
+          return this.state.dusts[d] ? <p key={i}>{this.state.dusts[d]} {d}</p> : '';
         }.bind(this))}
         <br/>
-        {LiquidsOrdered.map(function(l) {
-          return this.state.liquids[l] ? <p>{this.state.liquids[l]} {l}</p> : '';
+        {LiquidsOrdered.map(function(l, i) {
+          return this.state.liquids[l] ? <p key={i}>{this.state.liquids[l]} {l}</p> : '';
         }.bind(this))}
       </div>
     );

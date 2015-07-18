@@ -18,7 +18,7 @@ ReportModal = ReactMeteor.createClass({
 
   render: function() {
     return (
-      <div ref="modal" className="modal fade report-modal">
+      <div ref="modal" id="report-modal" className="modal fade">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -29,16 +29,18 @@ ReportModal = ReactMeteor.createClass({
               <label><input type="radio" name="style" value="0" checked={this.state.style == 0} onChange={this.onChangeStyle} />GearBunny</label>
               <label><input type="radio" name="style" value="1" checked={this.state.style == 1} onChange={this.onChangeStyle} />LOKI</label>
               <label><input type="radio" name="style" value="2" checked={this.state.style == 2} onChange={this.onChangeStyle} />Korts</label>
+              <br/>
               <ul className="nav nav-tabs">
-                <li><a href="#item" data-toggle="tab">Item Report</a></li>
-                <li className="active"><a href="#craft" data-toggle="tab">Craft Report</a></li>
+                <li className="active"><a href="#item" data-toggle="tab">Item Report</a></li>
+                <li><a href="#craft" data-toggle="tab">Craft Report</a></li>
               </ul>
               <div className="tab-content">
-                <div className="tab-pane" id="item">
+                <div className="tab-pane active" id="item">
+                  <br/>
                   <label><input type="checkbox" checkedLink={this.linkState('expand')}/>Expand dropped bonuses</label>
                   {this.displayReport()}
                 </div>
-                <div className="tab-pane active" id="craft">
+                <div className="tab-pane" id="craft">
                   {this.displayReportCrafting()}
                 </div>
               </div>

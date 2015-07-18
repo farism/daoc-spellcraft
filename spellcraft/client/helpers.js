@@ -1,3 +1,31 @@
+GetDefaultSlot = function(slot){
+  return {
+    id: slot.id,
+    name: slot.name,
+    crafted: slot.id >= 9,
+    itemName: '',
+    craftedItemName: 'Crafted',
+    equipped: true,
+    level: 51,
+    imbueArr: [0,0,0,0],
+    imbuePoints: 0,
+    imbueTotal: 32
+  };
+};
+
+GetDefaultBonus = function(slot, i){
+  return {
+    slot: slot.id,
+    index: i,
+    type: '',
+    effect: '',
+    amount: 0,
+    amountIndex: 0,
+    imbue: 0,
+    gem: ''
+  };
+};
+
 IsJewelSlot = function(id){
   return _.findWhere(JewelSlots, { id: id });
 };
@@ -16,6 +44,11 @@ GetRacesByRealm = function(realm){
 
 GetClassesByRealm = function(realm){
   return (_.findWhere(Realms, { name: realm }) || {}).classes || [];
+};
+
+GetClassIndex = function(realm, clss){
+  var classes = GetClassesByRealm(realm).map(function(clss){ return clss.name });
+  return classes.indexOf(clss);
 };
 
 GetCastStatByClass = function(realm, clss){
@@ -41,6 +74,15 @@ GetRacialResist = function(realm, race, effect){
   var races = _.findWhere(Realms, { name: realm }).races;
   var resists = _.findWhere(races, { name: race }).resists;
   return resists[effect] ? '+' + resists[effect] : '';
+};
+
+GetSkillsByClass = function(realm, clss){
+  var classIndex = GetClassIndex(realm, clss);
+  return _.where(SkillGems, { realm: realm }).filter(function(skill){
+    return skill.classes.indexOf(classIndex) >= 0;
+  }).map(function(skill){
+    return skill.name;
+  });
 };
 
 GetAmounts = function(type, effect){
@@ -88,8 +130,7 @@ GetGemName = function(type, effect, index, arr){
 };
 
 GetSkillEffects = function(realm, clss){
-  var classes = GetClassesByRealm(realm).map(function(clss){ return clss.name });
-  var classIndex = classes.indexOf(clss);
+  var classIndex = GetClassIndex(realm, clss);
   var gems = _.where(SkillGems, { realm: realm });
   return gems.filter(function(gem){
     return gem.classes.indexOf(classIndex) >= 0;
@@ -102,7 +143,7 @@ GetImbueCeiling = function(level){
   return ImbueTotals[parseInt(level, 10) - 1];
 };
 
-CalculateBonusImbue = function(type, effect, amount){
+CalculateBonusImbue = function(type, effect, amount, amountIndex){
   amount = parseInt(amount, 10) || 0;
   var imbue = 0;
 
@@ -112,7 +153,7 @@ CalculateBonusImbue = function(type, effect, amount){
     } else if(effect == 'Power') {
       imbue = (amount - 1) * 2;
     } else {
-      imbue = ((amount - 1) / 3) * 2 + 1;
+      imbue = [1, 3, 5, 6, 8, 10, 12, 13, 15, 17][amountIndex - 1] || 0;
     }
   } else if(type == 'Resist'){
     imbue = (amount - 1) * 2;

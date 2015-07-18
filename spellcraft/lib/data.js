@@ -1,3 +1,23 @@
+UtilityToA = {
+  'Cap Increase': 2,
+  'Cap Increase Hits': 0.25,
+  'Archery and Casting Speed': 5,
+  'Archery and Spell Range': 5,
+  'Archery and Spell Damage': 5,
+  'Melee Combat Speed': 5,
+  'Melee Damage': 5,
+  'Style Damage': 5,
+  'Resist Pierce': 5,
+  'Power Pool %': 2,
+  'Stat Buff Effectiveness': 2,
+  'Stat Debuff Effectiveness': 2,
+  'Healing Effectiveness': 2,
+  'Duration of Spells': 2,
+  '% Power Pool': 2,
+  'Fatigue': 2,
+  'AF': 1
+};
+
 ImbueTotals = [
   1,  2,  2,  3,  4,  4,  5,  5,  6,  7,
   7,  8,  9,  9, 10, 10, 11, 12, 12, 13,
@@ -121,34 +141,6 @@ BonusEffectsMap = {
   'Stat': BonusStat,
   'Cap Increase': BonusStatCap,
   'Resist': BonusResist
-};
-
-Utility = {
-  'Stat': 2/3,
-  'Stat Hits': 0.25,
-  'Resist': 2,
-  'Skill': 5,
-  'Power': 2
-}
-
-UtilityToA = {
-  'Cap Increase': 2,
-  'Cap Increase Hits': 0.25,
-  'Archery and Casting Speed': 5,
-  'Archery and Spell Range': 5,
-  'Archery and Spell Damage': 5,
-  'Melee Combat Speed': 5,
-  'Melee Damage': 5,
-  'Style Damage': 5,
-  'Resist Pierce': 5,
-  'Power Pool %': 2,
-  'Stat Buff Effectiveness': 2,
-  'Stat Debuff Effectiveness': 2,
-  'Healing Effectiveness': 2,
-  'Duration of Spells': 2,
-  '% Power Pool': 2,
-  'Fatigue': 2,
-  'AF': 1
 };
 
 JewelSlots = [

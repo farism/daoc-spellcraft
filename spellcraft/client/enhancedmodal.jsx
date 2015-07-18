@@ -26,7 +26,7 @@ EnhancedModal = ReactMeteor.createClass({
 
   render: function() {
     return (
-      <div ref="modal" className="modal fade enhanced-modal">
+      <div ref="modal" id="enhanced-modal" className="modal fade">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -84,6 +84,10 @@ EnhancedModal = ReactMeteor.createClass({
   },
 
   setEnhancedBonus: function(gear){
+    if(!gear){
+      return;
+    }
+    
     var arr = gear.value.split(' ');
     var type = '';
     var amount = parseInt(arr[0], 10);
@@ -99,7 +103,7 @@ EnhancedModal = ReactMeteor.createClass({
       type = gear.value.indexOf('Cap') >= 0 ? 'Cap Increase' : 'Stat';
     }
 
-    Slots.update({ id: this.props.slot }, { $set: { enhanced: true } });
+    Slots.update({ id: this.props.slot }, { $set: { enhanced: true, craftedItemName: gear.name } });
     Bonuses.update({ slot: this.props.slot, index: 4 }, { $set: { type: type, effect: effect, amount: amount } });
   }
 

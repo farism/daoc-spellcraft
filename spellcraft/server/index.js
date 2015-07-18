@@ -1,5 +1,14 @@
 Meteor.startup(function () {
 
+  smtp = {
+    username: 'daoctoolkit', 
+    password: 'Phelix22',
+    server: 'smtp.gmail.com',
+    port: 25
+  }
+
+  process.env.MAIL_URL = 'smtp://' + encodeURIComponent(smtp.username) + ':' + encodeURIComponent(smtp.password) + '@' + encodeURIComponent(smtp.server) + ':' + smtp.port;
+
   if(Templates.find().count() === 0) {
 
 

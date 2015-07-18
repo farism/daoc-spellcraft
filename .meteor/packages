@@ -9,7 +9,6 @@ autopublish
 insecure
 iron:router
 twbs:bootstrap
-ian:accounts-ui-bootstrap-3
 reactjs:react
 maxharris9:classnames
 waitingkuo:normalize
@@ -17,3 +16,5 @@ flemay:less-autoprefixer
 mrt:lesshat
 sergeyt:typeahead
 natestrauser:select2
+accounts-ui
+accounts-password

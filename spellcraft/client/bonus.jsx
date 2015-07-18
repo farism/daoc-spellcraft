@@ -28,10 +28,6 @@ Bonus = ReactMeteor.createClass({
     return state;
   },
 
-  componentDidUpdate: function(prevProps, prevState) {
-    Bonuses.update({ slot: this.props.slot.id, index: this.props.index }, { $set: _.omit(this.state, '_id') });
-  },
-
   render: function() {
     var realm = Session.get('meta').realm;
     var clss = Session.get('meta').class;
@@ -40,56 +36,68 @@ Bonus = ReactMeteor.createClass({
     var amount = amounts[this.state.amountIndex - 1] || '';
 
       return (
-      <div className={classNames({ bonus: 1, error: this.state.error })}>
+      <div className={classNames({ row: 1, bonus: 1, error: this.state.error })}>
 
-        <select name="type" value={this.state.type} onChange={this.onChangeType}>
-          <option value="">-type-</option>
-          {BonusTypes.map(function(type, i) {
-            return <option value={type} key={i}>{type}</option>;
-          }.bind(this))}
-        </select>
-
-        <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
-          <option value="">-effect-</option>
-          {effects.map(function(effect, i) {
-            return !(this.props.slot.crafted && effect == 'Acuity') ? <option value={effect} key={i}>{effect}</option> : '';
-          }.bind(this))}
-        </select>
-
-        {this.props.slot.crafted ? (
-          <select name="amount" value={amount} onChange={this.onChangeAmount}>
-            <option value="">-value-</option>
-            {amounts.map(function(value, i) {
-              return <option value={value} key={i}>{value}</option>
+        <div className="col-xs-3">
+          <select name="type" value={this.state.type} onChange={this.onChangeType}>
+            <option value="">-type-</option>
+            {BonusTypes.map(function(type, i) {
+              return <option value={type} key={i}>{type}</option>;
             }.bind(this))}
           </select>
-        ) : (
-          <input type="text" name="amount" maxLength="2" value={this.state.amount} onChange={this.onChangeAmount} />
-        )}
+        </div>
 
-        {!this.props.slot.crafted ? '' : (
-          <span className="imbue">{this.props.imbue.toFixed(1)}</span>
-        )}
+        <div className="col-xs-3">
+          <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
+            <option value="">-effect-</option>
+            {effects.map(function(effect, i) {
+              return !(this.props.slot.crafted && effect == 'Acuity') ? <option value={effect} key={i}>{effect}</option> : '';
+            }.bind(this))}
+          </select>
+        </div>
 
-        {GetGemName(this.state.type, this.state.effect, this.state.amountIndex)}
+        <div className="col-xs-2">
+          {this.props.slot.crafted ? (
+            <select name="amount" value={amount} onChange={this.onChangeAmount}>
+              <option value="">-value-</option>
+              {amounts.map(function(value, i) {
+                return <option value={value} key={i}>{value}</option>
+              }.bind(this))}
+            </select>
+          ) : (
+            <input type="text" name="amount" maxLength="2" value={this.state.amount} onChange={this.onChangeAmount} />
+          )}
+        </div>
+
+        <div className="col-xs-4 imbue">
+          {!this.props.slot.crafted ? '' : (
+            <span>{this.props.imbue.toFixed(1)}</span>
+          )}
+
+          {GetGemName(this.state.type, this.state.effect, this.state.amountIndex)}
+        </div>
       </div>
     );
   },
 
   onChangeType: function(e){
-    this.setState({ type: $(e.target).val(), effect: '', amount: '', amountIndex: 0, imbue: 0 });
+    var state = { type: $(e.target).val(), effect: '', amount: '', amountIndex: 0, imbue: 0 };
+    Bonuses.update({ slot: this.props.slot.id, index: this.props.index }, { $set: state });
   },
 
   onChangeEffect: function(e){
     var effect = $(e.target).val();
-    this.setState({ effect: effect });
-    if(!effect){
-      this.setState({ amount: '', amountIndex: 0, imbue: 0 });
+    if(effect){
+      var state = { effect: effect };
+    } else {
+      var state = { effect: effect, amount: '', amountIndex: 0, imbue: 0 };
     }
+    Bonuses.update({ slot: this.props.slot.id, index: this.props.index }, { $set: state });
   },
 
   onChangeAmount: function(e){
-    this.setState({ amount: parseInt($(e.target).val(), 10), amountIndex: $(e.target).prop('selectedIndex') });
+    var state = { amount: parseInt($(e.target).val(), 10), amountIndex: $(e.target).prop('selectedIndex') };
+    Bonuses.update({ slot: this.props.slot.id, index: this.props.index }, { $set: state });
   }
 
 });

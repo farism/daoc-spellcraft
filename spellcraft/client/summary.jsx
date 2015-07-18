@@ -12,13 +12,21 @@ Summary = ReactMeteor.createClass({
 
   getMeteorState: function() {
     var state = Session.get('meta');
-    var slots = _.pluck(Slots.find({ equipped: true }).fetch(), 'id');
-    var bonuses = Bonuses.find({ slot: { $in: slots } }).fetch();
-    var stats = this.getEffectTotals('Stat', BonusStat, bonuses);
-    var statcaps = this.getEffectTotals('Cap Increase', BonusStatCap, bonuses);
-    var resists = this.getEffectTotals('Resist', BonusResist, bonuses);
-    var other = this.getEffectTotals('Other Bonus', BonusOther, bonuses);
-    return _.extend(state, stats, statcaps, resists, other);
+    state.slots = Slots.find({ equipped: true }).fetch().map(function(slot) {
+      slot.bonuses = Bonuses.find({ slot: slot.id, amount: { $gt: 0 } }).fetch();
+      return slot;
+    });
+    state.skills = GetSkillsByClass(state.realm, state.class);
+    var bonuses = _.flatten(_.pluck(state.slots, 'bonuses'));
+    _.extend(
+      state,
+      this.getEffectTotals('Stat', BonusStat, bonuses), 
+      this.getEffectTotals('Skill', state.skills, bonuses), 
+      this.getEffectTotals('Cap Increase', BonusStatCap, bonuses), 
+      this.getEffectTotals('Resist', BonusResist, bonuses), 
+      this.getEffectTotals('Other Bonus', BonusOther, bonuses)
+    );
+    return state;
   },
 
   render: function() {
@@ -29,46 +37,56 @@ Summary = ReactMeteor.createClass({
     var castStat = GetCastStatByClass(realm, clss);
 
     return (
-      <div className="summary">
-
-        <label><input type="checkbox" checkedLink={this.linkState('fromCeiling')} /> Distance from cap</label>
-
-        <table>
-          <tr>
-            <td className="stats">
-              {BonusStat.map(function(effect, i){
-                return (effect != 'Acuity' && (castStats.indexOf(effect) < 0 || castStat == effect)) ? (
-                  <div key={i}>
-                    <label>{effect.substr(0,3)}: </label>
-                    <span>{this.getCeilingDisplay('Stat', effect)}</span>
-                    <span>({this.getCeilingDisplay('Cap Increase', effect)})</span>
-                  </div>
-                ) : '';
-              }.bind(this))}
-            </td>
-            <td className="resists">
-              {BonusResist.map(function(effect, i){
-                return (
-                  <div key={i}>
-                    <label>{effect}: </label>
-                    <span>{this.getCeilingDisplay('Resist', effect)}</span>
-                    <span>{GetRacialResist(realm, race, effect)}</span>
-                  </div>
-                );
-              }.bind(this))}
-            </td>
-          </tr>
-        </table>
-
-        {BonusOther.map(function(effect, i){
-          return !this.state[effect] ? '' : (
-            <div key={i}>
-              <label>{effect}: </label>
-              <span>{this.state[effect]}{effect != 'AF' && effect != 'Fatigue' ? '%' : ''}</span>
-            </div>
-          );
-        }.bind(this))}
-
+      <div id="summary">
+        <hr/>
+        <label className="from-ceiling"><input type="checkbox" checkedLink={this.linkState('fromCeiling')} /> Distance from cap</label>
+        <hr/>
+        <div className="row">
+          <div className="col-xs-6 stats">
+            {BonusStat.map(function(effect, i){
+              return (effect != 'Acuity' && (castStats.indexOf(effect) < 0 || castStat == effect)) ? (
+                <div key={i}>
+                  <label>{effect.substr(0,3)}: </label>
+                  <span>{this.getCeilingDisplay('Stat', effect)}</span>
+                  <span>({this.getCeilingDisplay('Cap Increase', effect)})</span>
+                </div>
+              ) : '';
+            }.bind(this))}
+          </div>
+          <div className="col-xs-6 resists">
+            {BonusResist.map(function(effect, i){
+              return (
+                <div key={i}>
+                  <label>{effect}: </label>
+                  <span>{this.getCeilingDisplay('Resist', effect)}</span>
+                  <span>{GetRacialResist(realm, race, effect)}</span>
+                </div>
+              );
+            }.bind(this))}
+          </div>
+        </div>
+        <hr/>
+        <div className="row">
+          <div className="col-xs-12 variant">
+            {this.state.skills.map(function(effect, i){
+              return this.state['Skill|' + effect] ? (
+                <div key={i}>
+                  <label>{effect}: </label>
+                  <span>{this.getCeilingDisplay('Skill', effect)}</span>
+                </div>
+              ) : '';
+            }.bind(this))}
+            <br/>
+            {BonusOther.map(function(effect, i){
+              return this.state['Other Bonus|' + effect] ? (
+                <div key={i}>
+                  <label>{effect}: </label>
+                  <span>{this.getCeilingDisplay('Other Bonus', effect)}</span>
+                </div>
+              ) : '';
+            }.bind(this))}
+          </div>
+        </div>
       </div>
     );
   },

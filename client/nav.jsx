@@ -3,7 +3,10 @@ Nav = ReactMeteor.createClass({
   templateName: 'Nav',
 
   getMeteorState: function() {
-    return { user: Meteor.user() }
+    return { 
+      user: Meteor.user(),
+      loggingIn: Meteor.loggingIn() 
+    }
   },
 
   render: function() {
@@ -30,24 +33,48 @@ Nav = ReactMeteor.createClass({
                   <span className="glyphicon glyphicon-user" />
                   <span className="caret" />
                 </a>
-                {this.state.user ? (
-                  <ul className="dropdown-menu">
-                    <li><a href="/my-characters">My Characters</a></li>
-                    <li><a href="/my-templates">My Templates</a></li>
-                    <li><a href="/sign-out">Sign Out</a></li>
-                  </ul>
-                ) : (
-                  <ul className="dropdown-menu">
-                    <li><a href="/sign-in">Sign In</a></li>
-                    <li><a href="/register">Register</a></li>
-                  </ul>
-                )}
+                {this.dropdown()}
               </li>
             </ul>
           </div>
         </div>
+        <LoginModal ref="login" />
+        <RegisterModal ref="register" />
       </nav>
     );
+  },
+
+  onClickLogin: function(e) {
+    this.refs.login.show();
+  },
+
+  onClickRegister: function(e) {
+    this.refs.register.show();
+  },
+
+  onClickLogout: function(e) {
+    Meteor.logout();
+  },
+
+  dropdown: function() {
+    if(this.state.user){
+      return (
+        <ul className="dropdown-menu">
+          <li><a href="/my-characters">My Characters</a></li>
+          <li><a href="/my-templates">My Templates</a></li>
+          <li><a href="#" onClick={this.onClickLogout}>Sign Out</a></li>
+        </ul>
+      );
+    } else if(this.state.loggingIn){
+      
+    } else {
+      return (
+        <ul className="dropdown-menu">
+          <li><a href="#" onClick={this.onClickLogin}>Sign In</a></li>
+          <li><a href="#" onClick={this.onClickRegister}>Register</a></li>
+        </ul>
+      );
+    }
   }
 
 });

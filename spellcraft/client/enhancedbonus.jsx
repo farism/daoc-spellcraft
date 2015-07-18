@@ -8,16 +8,22 @@ EnhancedBonus = ReactMeteor.createClass({
 
   render: function() {
     return (
-      <div className="bonus enhanced">
-        <select name="type">
-          <option>{this.state.type}</option>
-        </select>
-        <select name="effect">
-          <option>{this.state.effect}</option>
-        </select>
-        <select name="type">
-          <option>{this.state.amount}</option>
-        </select>
+      <div className="row bonus enhanced">
+        <div className="col-xs-3">
+          <select name="type">
+            <option>{this.state.type}</option>
+          </select>
+        </div>
+        <div className="col-xs-3">
+          <select name="effect">
+            <option>{this.state.effect}</option>
+          </select>
+        </div>
+        <div className="col-xs-2">
+          <select name="type">
+            <option>{this.state.amount}</option>
+          </select>
+        </div>
       </div>
     );
   }

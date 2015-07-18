@@ -1,11 +1,11 @@
 ReportMixin = {
 
-  output: function(type, effect){
+  output: function(type, effect, key){
     var amtAndCeil = this.getAmountAndCeiling(type, effect);
 
     if(amtAndCeil[0]){
       return (
-        <p>{effect} : {amtAndCeil[0]} / {amtAndCeil[1]}</p>
+        <p key={key}>{effect} : {amtAndCeil[0]} / {amtAndCeil[1]}</p>
       );
     } else {
       return '';
@@ -55,15 +55,15 @@ ReportMixin = {
       'Acuity': Math.floor(level * 1.5),
       'Hits': level * 4,
       'Power': Math.floor(level / 2),
-      'Body': Math.floor(level / 2 + 1),
-      'Cold': Math.floor(level / 2 + 1),
-      'Heat': Math.floor(level / 2 + 1),
-      'Energy': Math.floor(level / 2 + 1),
-      'Matter': Math.floor(level / 2 + 1),
-      'Spirit': Math.floor(level / 2 + 1),
-      'Crush': Math.floor(level / 2 + 1),
-      'Thrust': Math.floor(level / 2 + 1),
-      'Slash': Math.floor(level / 2 + 1),
+      'Resist|Body': Math.floor(level / 2 + 1),
+      'Resist|Cold': Math.floor(level / 2 + 1),
+      'Resist|Heat': Math.floor(level / 2 + 1),
+      'Resist|Energy': Math.floor(level / 2 + 1),
+      'Resist|Matter': Math.floor(level / 2 + 1),
+      'Resist|Spirit': Math.floor(level / 2 + 1),
+      'Resist|Crush': Math.floor(level / 2 + 1),
+      'Resist|Thrust': Math.floor(level / 2 + 1),
+      'Resist|Slash': Math.floor(level / 2 + 1),
       'Skill': Math.floor(level / 5 + 1),
       'Archery and Casting Speed': Math.floor(level / 5),
       'Archery and Spell Range': Math.floor(level / 5),

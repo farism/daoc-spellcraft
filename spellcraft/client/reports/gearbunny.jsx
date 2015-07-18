@@ -12,22 +12,31 @@ ReportGearBunny = ReactMeteor.createClass({
 
   getMeteorState: function() {
     var state = Session.get('meta');
-    var slots = Slots.find({ equipped: true }).fetch();
-    var bonuses = Bonuses.find({ slot: { $in: _.pluck(slots, 'id') } }).fetch();
-    var stats = this.getEffectTotals('Stat', BonusStat, bonuses);
-    var statcaps = this.getEffectTotals('Cap Increase', BonusStatCap, bonuses);
-    var resists = this.getEffectTotals('Resist', BonusResist, bonuses);
-    var other = this.getEffectTotals('Other Bonus', BonusOther, bonuses);
-    _.extend(state, stats, statcaps, resists, other);
-    state.slots = slots;
-    state.bonuses = bonuses;
+    state.slots = Slots.find({ equipped: true }).fetch().map(function(slot) {
+      slot.bonuses = Bonuses.find({ slot: slot.id, amount: { $gt: 0 } }).fetch();
+      return slot;
+    });
+    state.skills = GetSkillsByClass(state.realm, state.class);
+    var bonuses = _.flatten(_.pluck(state.slots, 'bonuses'));
+    _.extend(
+      state,
+      this.getEffectTotals('Stat', BonusStat, bonuses), 
+      this.getEffectTotals('Skill', state.skills, bonuses), 
+      this.getEffectTotals('Cap Increase', BonusStatCap, bonuses), 
+      this.getEffectTotals('Resist', BonusResist, bonuses), 
+      this.getEffectTotals('Other Bonus', BonusOther, bonuses)
+    );
     return state;
   },
 
   render: function() {
     return (
       <div>
-        <br/>
+        <p>DAOC Spellcraft Template Report</p>
+        <p>Configuration Name : {this.state.name}</p>
+        <p>Character Class : ({this.state.realm}) {this.state.class}</p>
+        <p>Character Level : {this.state.level}</p>
+        <p>Race : {this.state.race}</p>
         <br/>
         <p>&lt;-- Stats --&gt;</p>
         {this.output('Stat', 'Strength')}
@@ -75,12 +84,25 @@ ReportGearBunny = ReactMeteor.createClass({
         {this.output('Other Bonus', 'Fatigue')}
         <br/>
         <p>&lt;-- Skills --&gt;</p>
+        {this.state.skills.map(function(effect, i){
+          return this.output('Skill', effect, i);
+        }.bind(this))}
         <br/>
         <p>&lt;== Equipment Info ==&gt;</p>
         <br/>
-        <p>Weapons Equipped</p>
-        <br/>
-        <p>&lt;== Total Spellcraft Materials Needed ==&gt;</p>
+        {this.state.slots.map(function(slot){
+          if(slot.bonuses.length){
+            return (
+              <div>
+                <p>( {slot.name} ) : {slot.crafted ? slot.craftedItemName : slot.itemName}</p>
+                {slot.bonuses.map(function(bonus){
+                  return <p>{bonus.amount} {bonus.effect}</p>;
+                })}
+                <br />
+              </div>
+            );
+          }
+        }.bind(this))}
         <br/>
         <p>&lt;== End Report ==&gt;</p>
       </div>
