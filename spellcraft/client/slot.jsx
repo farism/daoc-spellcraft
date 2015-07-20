@@ -2,18 +2,14 @@ Slot = ReactMeteor.createClass({
 
   templateName: 'Slot',
 
-  mixins: [React.addons.LinkedStateMixin],
-
-  getInitialState: function() {
-    return {
-      enhanced: false
-    }
+  getDefaultProps: function() {
+    return {};
   },
 
-  getMeteorState: function() {
-    var state = Slots.findOne({ id: this.props.id });
+  componentWillReceiveProps: function(nextProps) {
+    var state = {};
 
-    state.imbueArr = Bonuses.find({ slot: this.props.id }).fetch().slice(0, 4).map(function(bonus){
+    state.imbueArr = nextProps.slot.bonuses.slice(0, 4).map(function(bonus){
       return CalculateBonusImbue(bonus.type, bonus.effect, bonus.amount, bonus.amountIndex) / 2;
     });
 
@@ -24,29 +20,24 @@ Slot = ReactMeteor.createClass({
       return prev + cur;
     }, 0);
 
-    return state;
-  },
-
-  componentDidUpdate: function(prevProps, prevState) {
-    Slots.update({ id: this.props.id }, { $set: _.omit(this.state, '_id') });
-
-    if(prevState.crafted != this.state.crafted){
-      Bonuses.update({ slot: this.state.id }, { $set: { type: '', effect: '', amount: 0, amountIndex: 0, imbue: 0 } });
-    }
+    this.setState(state);
   },
 
   render: function() {
+    var character = this.props.character;
+    var slot = this.props.slot;
+
     return (
       <div className="slot">
 
         <div className="row">
-          <div className="col-xs-6">
-            {this.props.id >= 9 ? (
-              <label><input type="checkbox" name="crafted" checkedLink={this.linkState('crafted')} />Crafted</label>
+          <div className="col-xs-12 crafted">
+            {slot.id >= 9 ? (
+              <label><input type="checkbox" checked={slot.crafted} onChange={this.onChangeCrafted} />Crafted</label>
             ) : ''}
 
-            {this.props.id >= 16 ? (
-              <label><input type="checkbox" name="equiped" checkedLink={this.linkState('equipped')} />Equipped</label>
+            {slot.id >= 16 ? (
+              <label><input type="checkbox" checked={slot.equipped} onChange={this.changeEquipped} />Equipped</label>
             ) : ''}
           </div>
         </div>
@@ -55,59 +46,45 @@ Slot = ReactMeteor.createClass({
           <div className="col-xs-12">
             <div className="row">
               <div className="col-xs-6">
-                {this.state.crafted ? (
-                  <input type="number" name="level" min="1" max="51" maxLength="2" valueLink={this.linkState('level')} />
+                {slot.crafted ? (
+                  <input type="number" name="level" min="1" max="51" maxLength="2" value={slot.level} onChange={this.onChangeLevel} />
                 ) : ''}
 
-                {this.state.crafted ? (
-                  <span className="item-imbue">{this.state.imbuePoints.toFixed(1)} / {GetImbueCeiling(this.state.level).toFixed(1)}</span>
+                {slot.crafted ? (
+                  <span className="item-imbue">{slot.imbuePoints.toFixed(1)} / {GetImbueCeiling(slot.level).toFixed(1)}</span>
                 ) : ''}
 
-                {this.state.crafted ? (
-                  <span className="item-name">{this.state.craftedItemName}</span>
+                {slot.crafted ? (
+                  <span className="item-name">{slot.craftedItemName}</span>
                 ) : ''}
 
-                {!this.state.crafted ? (
-                  <ItemSearch location={this.state.name} onSelect={this.onSelectItem} />
+                {!slot.crafted ? (
+                  <ItemSearch location={slot.name} value={slot.itemName} onChange={this.onChangeSearch} onSelect={this.onSelectSearch} />
                 ) : ''}
               </div>
               <div className="col-xs-2">
-                <div className="btn-group">
-                  <button type="button" className="dropdown-toggle" data-toggle="dropdown">
-                    <span className="glyphicon glyphicon-cog" />
-                  </button>
-                  <ul className="dropdown-menu" role="menu">
-                    <li onClick={this.onClickSave}><a href="#">Save Item</a></li>
-                    <li onClick={this.onClickClear}><a href="#">Clear Item</a></li>
-                    <li className="dropdown-submenu">
-                      <a href="#">Move Item</a>
-                      <ul className="dropdown-menu">
-                        {AllSlots.map(function(slot, i){
-                          return <li onClick={this.onClickMove.bind(this, slot)} key={i}><a href="#">{slot.name}</a></li>;
-                        }.bind(this))}
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+                {this.operations()}
               </div>
             </div>
           </div>
         </div>
 
-        {_.range(0, this.state.crafted ? 4 : 10).map(function(val, i){
-          return <Bonus slot={this.state} imbue={this.state.imbueArr[i]} enhanced={this.state.crafted && i == 4} index={i} key={i} />;
+        {slot.bonuses.slice(0, slot.crafted ? 5 : 10).map(function(bonus, i){
+          if(slot.crafted && i == 4){
+            if(slot.bonuses[i].amount){
+              return <EnhancedBonus slot={slot} index={i} key={i} />
+            }
+          } else {
+            return <Bonus2 />;
+          }
         }.bind(this))}
 
-        {this.state.crafted && this.state.enhanced ? (
-          <EnhancedBonus slot={this.state} index={4} />
-        ) : ''}
-
         <div className="enhanced-actions">
-          {this.state.crafted ? (
+          {slot.crafted ? (
             <button className="btn btn-default" onClick={this.onClickEnhanced}>Enhanced Bonus</button>
           ) : ''}
 
-          {this.state.enhanced ? (
+          {slot.enhanced ? (
             <button className="btn btn-default" onClick={this.onClickEnhancedClear}>Clear Enhanced</button>
           ) : ''}
         </div>
@@ -116,36 +93,110 @@ Slot = ReactMeteor.createClass({
     );
   },
 
-  onClickSave: function(e) {
-    this.props.onClickSaveItem(this.state);
+  operations: function() {
+    var ops = [
+      { label: 'Copy Item To', cb: this.onClickCopy },
+      { label: 'Move Item To', cb: this.onClickMove }
+    ];
+
+    return (
+      <div className="btn-group">
+        <button type="button" className="dropdown-toggle" data-toggle="dropdown">
+          <span className="glyphicon glyphicon-cog" />
+        </button>
+        <ul className="dropdown-menu" role="menu">
+          <li onClick={this.onClickSave}><a href="#">Save Item</a></li>
+          <li onClick={this.onClickClear}><a href="#">Clear Item</a></li>
+          {ops.map(function(op, i){
+            return (
+              <li className="dropdown-submenu" key={i}>
+                <a href="#">{op.label}</a>
+                <ul className="dropdown-menu">
+                  {Slots.find().fetch().map(function(slot, j){
+                    return (
+                      <li onClick={op.cb.bind(this, slot._id)} key={j}>
+                        <a href="#">{slot.id == 4 || slot.id == 6 ? 'L. ' : ''} {slot.id == 5 || slot.id == 7 ? 'R. ' : ''} {slot.name}</a>
+                      </li>
+                    );
+                  }.bind(this))}
+                </ul>
+              </li>
+            );
+          }.bind(this))}
+        </ul>
+      </div>
+    );
   },
 
-  onClickMove: function(slot, e) {
-    Slots.update({ id: slot.id }, { $set: this.state });
-    Bonuses.find({ slot: this.state.id }).map(function(bonus){
-      Bonuses.update({ slot: slot.id }, { $set: bonus });
-    });
-    this.onClickClear();
+  update: function(state) {
+    var template = Session.get('template');
+    var slot = _.findWhere(template.slots, { id: this.props.slot.id });
+    _.extend(slot, state);
+    Session.set('template', template);
+  },
+
+  reset: function() {
+  },
+
+  copy: function(slot) {
+  },
+
+  save: function() {
+  },
+
+  onChangeCrafted: function(e) {
+    this.update({ crafted: $(e.target).is(':checked') });
+  },
+
+  onChangeEquipped: function(e) {
+    this.update({ equipped: $(e.target).is(':checked') });
+  },
+
+  onChangeLevel: function(e) {
+    var lvl = parseInt($(e.target).val(), 10) || 1;
+    this.update({ level: Math.min(51, Math.max(1, lvl)) });
+  },
+
+  onClickSave: function(e) {
+    if(Meteor.user()){
+      this.save();
+    } else {
+      Session.set({ login: { callback: this.save.bind(this) } });
+    }
   },
 
   onClickClear: function() {
-    Slots.update({ id: this.state.id }, { $set: _.omit(GetDefaultSlot(this.state), '_id') });
-    _.range(0, 10).map(function(i){
-      Bonuses.update({ slot: this.state.id, index: i }, { $set: _.omit(GetDefaultBonus(this.state, i), '_id') });
-    }.bind(this))
+    this.reset();
   },
 
-  onSelectItem: function(item, i) {
-    console.log(item);
+  onClickCopy: function(slot, e) {
+    this.copy(slot);
+  },
+
+  onClickMove: function(slot, e) {
+    this.copy(slot);
+    this.reset();
+  },
+
+  onChangeSearch: function(val) {
+    // Slots.update({ _id: this.props._id }, { $set: { itemName: val } });
+  },
+
+  onSelectSearch: function(item) {
+    this.onClickClear();
+    /*item.dropitem.map(function(bonus, i) {
+      bonus.amount = parseInt(bonus.amount, 10);
+      Bonuses.update({ _id: this.props.bonuses[i]._id }, { $set: bonus });
+    }.bind(this));
+    Slots.update({ id: this.props._id }, { $set: { itemName: item.itemname } });*/
   },
 
   onClickEnhanced: function(e) {
-    this.props.onClickEnhanceItem(this);
+    this.props.onClickEnhanceItem(this.props._id);
   },
 
-  onClickEnhancedClear: function(){
-    Bonuses.update({ slot: this.state.id, index: 4 }, { $set: { type: '', effect: '', amount: 0, amountIndex: 0, imbue: 0 } });
-    this.setState({ enhanced: false });
+  onClickEnhancedClear: function() {
+    // Bonuses.update({ _id: this.props.bonuses[4]._id }, { $set: GetDefaultBonus(this.props._id) });
   }
 
 });

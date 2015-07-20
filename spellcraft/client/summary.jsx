@@ -20,10 +20,10 @@ Summary = ReactMeteor.createClass({
     var bonuses = _.flatten(_.pluck(state.slots, 'bonuses'));
     _.extend(
       state,
-      this.getEffectTotals('Stat', BonusStat, bonuses), 
-      this.getEffectTotals('Skill', state.skills, bonuses), 
-      this.getEffectTotals('Cap Increase', BonusStatCap, bonuses), 
-      this.getEffectTotals('Resist', BonusResist, bonuses), 
+      this.getEffectTotals('Stat', BonusStat, bonuses),
+      this.getEffectTotals('Skill', state.skills, bonuses),
+      this.getEffectTotals('Cap Increase', BonusStatCap, bonuses),
+      this.getEffectTotals('Resist', BonusResist, bonuses),
       this.getEffectTotals('Other Bonus', BonusOther, bonuses)
     );
     return state;

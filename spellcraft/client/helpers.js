@@ -5,6 +5,7 @@ GetDefaultSlot = function(slot){
     crafted: slot.id >= 9,
     itemName: '',
     craftedItemName: 'Crafted',
+    enhanced: false,
     equipped: true,
     level: 51,
     imbueArr: [0,0,0,0],
@@ -13,16 +14,14 @@ GetDefaultSlot = function(slot){
   };
 };
 
-GetDefaultBonus = function(slot, i){
+GetDefaultBonus = function(slot_id){
   return {
-    slot: slot.id,
-    index: i,
+    slot: slot_id,
     type: '',
     effect: '',
     amount: 0,
     amountIndex: 0,
-    imbue: 0,
-    gem: ''
+    imbue: 0
   };
 };
 
@@ -127,6 +126,22 @@ GetGemName = function(type, effect, index, arr){
   gem = _.compact(gem);
 
   return gem.length == 3 ? (arr ? gem : gem.join(' ')) : '';
+};
+
+GetBonusAbbreviation = function(bonus) {
+  var suffix = bonus.effect;
+
+  if(bonus.type == 'Stat'){
+    suffix = bonus.effect.substr(0, 3);
+  } else if(bonus.type == 'Cap Increase') {
+    suffix = bonus.effect.substr(0, 3) + ' Cap';
+  } else if(bonus.type == 'Other Bonus') {
+    suffix = bonus.effect;
+  } else if(bonus.type == 'Resist') {
+    suffix = bonus.effect + ' Resist';
+  }
+
+  return bonus.amount + ' ' + suffix;
 };
 
 GetSkillEffects = function(realm, clss){

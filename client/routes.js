@@ -1,19 +1,19 @@
 Router.route('/', function () {
-  this.layout('Layout');
-  this.render('Spellcraft');
+  this.wait([Meteor.subscribe('items'), Meteor.subscribe('templates')]);
+  // this.render(this.ready() ? 'Spellcraft' : 'Loading');
+  this.render('sc');
 });
 
 Router.route('/charplan', function () {
-  this.layout('Layout');
   this.render('Charplan');
 });
 
 Router.route('/spellcraft', function () {
-  this.layout('Layout');
+  this.wait([Meteor.subscribe('items'), Meteor.subscribe('templates')]);
+  // this.render(this.ready() ? 'Spellcraft' : 'Loading');
   this.render('Spellcraft');
 });
 
 Router.route('/item-search', function () {
-  this.layout('Layout');
   this.render('ItemSearch');
 });

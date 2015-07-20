@@ -3,9 +3,9 @@ Nav = ReactMeteor.createClass({
   templateName: 'Nav',
 
   getMeteorState: function() {
-    return { 
+    return {
       user: Meteor.user(),
-      loggingIn: Meteor.loggingIn() 
+      loggingIn: Meteor.loggingIn()
     }
   },
 
@@ -23,8 +23,8 @@ Nav = ReactMeteor.createClass({
           </div>
           <div id="navbar-collapse" className="collapse navbar-collapse">
             <ul className="nav navbar-nav">
-              <li className="active"><a href="/charplan">Charplan</a></li>
-              <li><a href="/spellcraft">Spellcraft</a></li>
+              {/*<li><a href="/charplan">Charplan</a></li>*/}
+              <li className="active"><a href="/spellcraft">Spellcraft</a></li>
               <li><a href="/item-search">Item Search</a></li>
             </ul>
             <ul className="nav navbar-nav navbar-right">
@@ -38,8 +38,8 @@ Nav = ReactMeteor.createClass({
             </ul>
           </div>
         </div>
-        <LoginModal ref="login" />
-        <RegisterModal ref="register" />
+        <ModalLogin ref="login" />
+        <ModalRegister ref="register" />
       </nav>
     );
   },
@@ -66,7 +66,7 @@ Nav = ReactMeteor.createClass({
         </ul>
       );
     } else if(this.state.loggingIn){
-      
+
     } else {
       return (
         <ul className="dropdown-menu">

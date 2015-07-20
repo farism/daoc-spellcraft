@@ -199,19 +199,19 @@ Realms = [
       { name: 'Armsman', armor: 4, races: [0, 1, 2, 3, 4, 5, 6] }, //0
       { name: 'Cabalist', armor: 0, castStat: 'Intelligence', races: [0, 1, 3, 4, 5] }, //1
       { name: 'Cleric', armor: 3, castStat: 'Piety', races: [0, 1, 2] }, //2
-      { name: 'Friar', armor: 1, castStat: 'Piety', races: [1] }, //3
+      { name: 'Friar', armor: 1, castStat: 'Piety', races: [0, 1, 2] }, //3
       { name: 'Heretic', armor: 0, castStat: 'Piety', races: [0, 1, 4, 6] }, //4
       { name: 'Infiltrator', armor: 1, races: [1, 3, 4] }, //5
-      { name: 'Mauler', armor: 1, races: [1, 5, 6] }, //6
+      { name: 'Mauler', armor: 1, races: [1, 4, 5, 6] }, //6
       { name: 'Mercenary', armor: 3, races: [0, 1, 2, 3, 4, 5, 6] }, //7
       { name: 'Minstrel', armor: 3, castStat: 'Charisma', races: [1, 2, 3, 4] }, //8
-      { name: 'Necromancer', armor: 0, castStat: 'Intelligence', races: [1, 3, 4] }, //9
+      { name: 'Necromancer', armor: 0, castStat: 'Intelligence', races: [0, 1, 3, 4] }, //9
       { name: 'Paladin', armor: 4, races: [0, 1, 2, 3] }, //10
-      { name: 'Reaver', armor: 3, castStat: 'Piety', races: [1, 3, 4] }, //11
+      { name: 'Reaver', armor: 3, castStat: 'Piety', races: [1, 3, 4, 6] }, //11
       { name: 'Scout', armor: 2, races: [1, 2, 3, 4] }, //12
       { name: 'Sorcerer', armor: 0, castStat: 'Intelligence', races: [0, 1, 3, 4, 5] }, //13
       { name: 'Theurgist', armor: 0, castStat: 'Intelligence', races: [0, 1, 5] }, //14
-      { name: 'Wizard', armor: 0, castStat: 'Intelligence', races: [0, 1, 5] } //15
+      { name: 'Wizard', armor: 0, castStat: 'Intelligence', races: [0, 1, 4, 5] } //15
     ],
 
     armor: [
@@ -320,21 +320,21 @@ Realms = [
     name: 'Hibernia',
 
     races: [
-      { name: 'Celt', resists: { 'Crush': 2, 'Slash': 3, 'Spirit': 5 } },
-      { name: 'Elf', resists: { 'Slash': 2, 'Thrust': 3, 'Spirit': 5 } },
-      { name: 'Firbolg', resists: { 'Crush': 3, 'Slash': 2, 'Heat': 5 } },
-      { name: 'Lurikeen', resists: { 'Crush': 5, 'Energy': 5 } },
-      { name: 'Sylvan', resists: { 'Crush': 3, 'Thrust': 2, 'Matter': 5, 'Energy': 5 } },
-      { name: 'Shar', resists: { 'Crush': 5, 'Energy': 5 } },
-      { name: 'Minotaur', resists: { 'Crush': 4, 'Heat': 3, 'Cold': 3 } }
+      { name: 'Celt', resists: { 'Crush': 2, 'Slash': 3, 'Spirit': 5 } }, //0
+      { name: 'Elf', resists: { 'Slash': 2, 'Thrust': 3, 'Spirit': 5 } }, //1
+      { name: 'Firbolg', resists: { 'Crush': 3, 'Slash': 2, 'Heat': 5 } }, //2
+      { name: 'Lurikeen', resists: { 'Crush': 5, 'Energy': 5 } }, //3
+      { name: 'Sylvan', resists: { 'Crush': 3, 'Thrust': 2, 'Matter': 5, 'Energy': 5 } }, //4
+      { name: 'Shar', resists: { 'Crush': 5, 'Energy': 5 } }, //5
+      { name: 'Minotaur', resists: { 'Crush': 4, 'Heat': 3, 'Cold': 3 } } //6
     ],
 
     classes: [
-      { name: 'Animist', armor: 0, castStat: 'Intelligence', races: [0, 2, 4] }, //0
+      { name: 'Animist', armor: 0, castStat: 'Intelligence', races: [0, 1, 2, 4] }, //0
       { name: 'Bainshee', armor: 0, castStat: 'Intelligence', races: [0, 1, 3] }, //1
       { name: 'Bard', armor: 2, castStat: 'Charisma', races: [0, 2] }, //2
       { name: 'Blademaster', armor: 2, races: [0, 1, 2, 5, 6] }, //3
-      { name: 'Champion', armor: 3, races: [0, 1, 3, 5] }, //4
+      { name: 'Champion', armor: 3, races: [0, 1, 3, 4, 5] }, //4
       { name: 'Druid', armor: 3, castStat: 'Empathy', races: [0, 2, 4] }, //5
       { name: 'Eldritch', armor: 0, castStat: 'Intelligence', races: [1, 3] }, //6
       { name: 'Enchanter', armor: 0, castStat: 'Intelligence', races: [1, 3] }, //7
@@ -343,7 +343,7 @@ Realms = [
       { name: 'Mentalist', armor: 0, castStat: 'Intelligence', races: [0, 1, 3, 5] }, //10
       { name: 'Nightshade', armor: 1, races: [0, 1, 3] }, //11
       { name: 'Ranger', armor: 2, races: [0, 1, 3, 5] }, //12
-      { name: 'Valewalker', armor: 0, castStat: 'Intelligence', races: [0, 2, 4] }, //13
+      { name: 'Valewalker', armor: 0, castStat: 'Intelligence', races: [0, 2, 4, 6] }, //13
       { name: 'Vampiir', armor: 1, races: [0, 3, 5] }, //14
       { name: 'Warden', armor: 3, castStat: 'Empathy', races: [0, 2, 4, 6] } //15
     ],
@@ -458,30 +458,30 @@ Realms = [
     name: 'Midgard',
 
     races: [
-      { name: 'Dwarf', resists: { 'Slash': 2, 'Thrust': 3, 'Body': 5 } },
-      { name: 'Troll', resists: { 'Slash': 3, 'Thrust': 2, 'Matter': 5 } },
-      { name: 'Kobold', resists: { 'Crush': 5, 'Energy': 5 } },
-      { name: 'Norseman', resists: { 'Crush': 2, 'Slash': 3, 'Cold': 5 } },
-      { name: 'Valykn', resists: { 'Slash': 3, 'Thrust': 2, 'Cold': 5, 'Body': 5 } },
-      { name: 'Frostalf', resists: { 'Slash': 2, 'Thrust': 3, 'Spirit': 5 } },
-      { name: 'Minotaur', resists: { 'Crush': 4, 'Heat': 3, 'Cold': 3 } }
+      { name: 'Dwarf', resists: { 'Slash': 2, 'Thrust': 3, 'Body': 5 } }, //0
+      { name: 'Troll', resists: { 'Slash': 3, 'Thrust': 2, 'Matter': 5 } }, //1
+      { name: 'Kobold', resists: { 'Crush': 5, 'Energy': 5 } }, //2
+      { name: 'Norseman', resists: { 'Crush': 2, 'Slash': 3, 'Cold': 5 } }, //3
+      { name: 'Valykn', resists: { 'Slash': 3, 'Thrust': 2, 'Cold': 5, 'Body': 5 } }, //4
+      { name: 'Frostalf', resists: { 'Slash': 2, 'Thrust': 3, 'Spirit': 5 } }, //5
+      { name: 'Minotaur', resists: { 'Crush': 4, 'Heat': 3, 'Cold': 3 } } //6
     ],
 
     classes: [
       { name: 'Berserker', armor: 2, races: [0, 1, 2, 3, 4, 6] }, //0
-      { name: 'Bonedancer', armor: 0, castStat: 'Piety', races: [1, 2, 4] }, //1
+      { name: 'Bonedancer', armor: 0, castStat: 'Piety', races: [1, 2, 4, 5] }, //1
       { name: 'Healer', armor: 3, castStat: 'Piety', races: [0, 3, 5] }, //2
       { name: 'Hunter', armor: 2, races: [0, 2, 3, 4] }, //3
-      { name: 'Mauler', armor: 1, races: [1, 3, 6] }, //4
+      { name: 'Mauler', armor: 1, races: [1, 2, 3, 6] }, //4
       { name: 'Runemaster', armor: 0, castStat: 'Piety', races: [0, 2, 3, 5] }, //5
       { name: 'Savage', armor: 2, races: [0, 1, 2, 3, 4] }, //6
-      { name: 'Shadowblade', armor: 1, races: [2, 3, 4] }, //7
-      { name: 'Shaman', armor: 3, castStat: 'Piety', races: [1, 2, 5] }, //8
-      { name: 'Skald', armor: 3, castStat: 'Charisma', races: [0, 1, 2, 3] }, //9
+      { name: 'Shadowblade', armor: 1, races: [2, 3, 4, 5] }, //7
+      { name: 'Shaman', armor: 3, castStat: 'Piety', races: [0, 1, 2, 5] }, //8
+      { name: 'Skald', armor: 3, castStat: 'Charisma', races: [0, 1, 2, 3, 6] }, //9
       { name: 'Spiritmaster', armor: 0, castStat: 'Piety', races: [2, 3, 5] }, //10
-      { name: 'Thane', armor: 3, castStat: 'Piety', races: [0, 1, 3, 5] }, //11
+      { name: 'Thane', armor: 3, castStat: 'Piety', races: [0, 1, 3, 4, 5] }, //11
       { name: 'Valkyrie', armor: 3, castStat: 'Piety', races: [0, 3, 5] }, //12
-      { name: 'Warlock', armor: 0, castStat: 'Piety', races: [2, 3, 5] }, //13
+      { name: 'Warlock', armor: 0, castStat: 'Piety', races: [1, 2, 3, 5] }, //13
       { name: 'Warrior', armor: 3, races: [0, 1, 2, 3, 4, 6] } //14
     ],
 
