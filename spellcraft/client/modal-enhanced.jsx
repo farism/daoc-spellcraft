@@ -4,9 +4,15 @@ ModalEnhanced = ReactMeteor.createClass({
 
   getInitialState: function() {
     return {
-      selected: -1,
-      gear: GetEnhancedBonusesBySlot(this.props.realm, this.props.class, this.props.slot)
+      selected: -1
     }
+  },
+
+  getMeteorState: function() {
+    var character = Session.get('character');
+    return {
+      gear: GetEnhancedBonusesBySlot(character.realm, character.class, this.props.slot.id)
+    };
   },
 
   componentDidMount: function() {
@@ -92,11 +98,7 @@ ModalEnhanced = ReactMeteor.createClass({
       type = gear.value.indexOf('Cap') >= 0 ? 'Cap Increase' : 'Stat';
     }
 
-    var state = Session.get('template');
-    var slot = _.findWhere(state.slots, { id: this.props.slot });
-    slot.craftedItemName = gear.name;
-    slot.bonuses[4] = { type: type, effect: effect, amount: amount };
-    Session.set('template', state);
+    this.props.onSelect(gear.name, { type: type, effect: effect, amount: amount });
   }
 
 });

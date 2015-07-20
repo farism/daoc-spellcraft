@@ -2,20 +2,34 @@ Bonus = ReactMeteor.createClass({
 
   templateName: 'Bonus',
 
+  getInitialState: function() {
+    return Bonuses.findOne({ _id: this.props._id });
+  },
+
+  getMeteorState: function() {
+    return {
+      slot: Slots.findOne({ _id: this.props.slotid }),
+      character: Session.get('character')
+    };
+  },
+
+  componentDidUpdate: function(prevState) {
+    Bonuses.update({ _id: this.state._id }, { $set: _.omit(this.state, '_id') });
+  },
+
   render: function() {
-    var realm = this.props.character.realm;
-    var clss = this.props.character.class;
-    var slot = this.props.slot;
-    var bonus = slot.bonuses[this.props.index];
-    var effects = bonus.type == 'Skill' ? GetSkillEffects(realm, clss) : BonusEffectsMap[bonus.type] || [];
-    var amounts = GetAmounts(this.props.type, this.props.effect);
-    var amount = amounts[bonus.amountIndex - 1] || '';
+    var realm = this.state.character.realm;
+    var clss = this.state.character.class;
+    var slot = this.state.slot;
+    var effects = this.state.type == 'Skill' ? GetSkillEffects(realm, clss) : BonusEffectsMap[this.state.type] || [];
+    var amounts = GetAmounts(this.state.type, this.state.effect);
+    var amount = amounts[this.state.amountIndex - 1] || '';
 
     return (
       <div className={classNames({ row: 1, bonus: 1, error: this.props.error })}>
 
         <div className="col-xs-3">
-          <select name="type" value={bonus.type} onChange={this.onChangeType}>
+          <select name="type" value={this.state.type} onChange={this.onChangeType}>
             <option value="">-type-</option>
             {BonusTypes.map(function(type, i) {
               return <option value={type} key={i}>{type}</option>;
@@ -24,7 +38,7 @@ Bonus = ReactMeteor.createClass({
         </div>
 
         <div className="col-xs-3">
-          <select name="effect" value={bonus.effect} onChange={this.onChangeEffect}>
+          <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
             <option value="">-effect-</option>
             {effects.map(function(effect, i) {
               return !(slot.crafted && effect == 'Acuity') ? <option value={effect} key={i}>{effect}</option> : '';
@@ -41,28 +55,24 @@ Bonus = ReactMeteor.createClass({
               }.bind(this))}
             </select>
           ) : (
-            <input type="number" name="amount" min="0" maxLength="2" value={bonus.amount} onChange={this.onChangeAmount} />
+            <input type="number" name="amount" min="0" maxLength="2" value={this.state.amount} onChange={this.onChangeAmount} />
           )}
         </div>
 
         <div className="col-xs-4 imbue">
           {!slot.crafted ? '' : (
-            <span>{bonus.imbue.toFixed(1)}</span>
+            <span>{this.state.imbue.toFixed(1)}</span>
           )}
 
-          {GetGemName(bonus.type, bonus.effect, bonus.amountIndex)}
+          {GetGemName(this.state.type, this.state.effect, this.state.amountIndex)}
         </div>
       </div>
     );
   },
 
-  update: function() {
-
-  },
-
   onChangeType: function(e){
     var state = { type: $(e.target).val(), effect: '', amount: '', amountIndex: 0, imbue: 0 };
-    // Bonuses.update({ _id: this.props._id }, { $set: state });
+    this.setState(state);
   },
 
   onChangeEffect: function(e){
@@ -72,14 +82,11 @@ Bonus = ReactMeteor.createClass({
     } else {
       var state = { effect: effect, amount: '', amountIndex: 0, imbue: 0 };
     }
-    // Bonuses.update({ _id: this.props._id }, { $set: state });
+    this.setState(state);
   },
 
   onChangeAmount: function(e){
-    /*Bonuses.update({ _id: this.props._id }, { $set: {
-      amount: (parseInt($(e.target).val(), 10) || 0),
-      amountIndex: ($(e.target).prop('selectedIndex') || 0)
-    }});*/
+    this.setState({ amount: parseInt($(e.target).val(), 10) || 0, amountIndex: $(e.target).prop('selectedIndex') });
   }
 
 });

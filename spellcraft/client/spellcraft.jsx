@@ -1,29 +1,22 @@
-Slots = new Mongo.Collection(null);
+Slots = new Meteor.Collection(null);
 
-Bonuses = new Mongo.Collection(null);
+Bonuses = new Meteor.Collection(null);
 
-Session.set('template', {
+Session.set('character', {
   name: '',
-  character: {
-    realm: 'Albion',
-    class: 'Armsman',
-    race: 'Avalonian',
-    level: 50,
-    rank: '1L1'
-  },
-  slots: AllSlots.map(function(slot){
-    Slots.insert(GetDefaultSlot(slot));
-
-    var s = GetDefaultSlot(slot);
-    s.bonuses = [];
-    _.range(0, 10).map(function(i){
-      s.bonuses.push(GetDefaultBonus(s.id));
-    });
-    return s;
-  })
+  realm: 'Albion',
+  class: 'Armsman',
+  race: 'Avalonian',
+  level: 50,
+  rank: '1L1'
 });
 
-
+AllSlots.map(function(slot){
+  var slot = Slots.insert(GetDefaultSlot(slot));
+  _.range(0,10).map(function(i){
+    Bonuses.insert(GetDefaultBonus(slot, i));
+  });
+});
 
 Spellcraft = ReactMeteor.createClass({
 
@@ -31,26 +24,11 @@ Spellcraft = ReactMeteor.createClass({
 
   getInitialState: function() {
     return {
-      activeSlot: 9
+      activeSlot: Slots.findOne({ id: 9 })
     }
-  },
-
-  getMeteorState: function() {
-    return {
-      template: Session.get('template')
-    }
-  },
-
-  componentDidMount: function() {
-    window.onbeforeunload = function() {
-      //return "Data will be lost if you leave the page, are you sure?";
-    };
   },
 
   render: function() {
-    var character = this.state.template.character || {};
-    var slot = _.findWhere(this.state.template.slots, { id: this.state.activeSlot }) || {};
-
     return (
       <div id="app">
         <Nav ref="nav" />
@@ -63,30 +41,29 @@ Spellcraft = ReactMeteor.createClass({
                 <button onClick={this.onClickDuplicate} title="Duplicate"><span className="glyphicon glyphicon-transfer" /></button>
                 <button onClick={this.onClickLoad} title="Load"><span className="glyphicon glyphicon-folder-open" /></button>
               </div>
-              <Meta name={this.state.template.name} {...this.state.template.character} />
+              <Meta />
+              <Summary />
             </div>
             <div className="col-sm-9">
               <div id="slots">
                 <ul id="tabs" className="nav nav-pills">
-                  {AllSlots.map(function(slot, i){
+                  {Slots.find().fetch().map(function(slot, i){
                     return (
-                      <li className={this.state.activeSlot == slot.id ? 'active' : ''} onClick={this.onClickSlot.bind(this, slot.id)} key={i}>
+                      <li className={this.state.activeSlot.id == slot.id ? 'active' : ''} onClick={this.onClickSlot.bind(this, slot.id)} key={i}>
                         <a>{slot.name}</a>
                       </li>
                     );
                   }.bind(this))}
                 </ul>
                 <br/>
-                <div id="slots">
-                  <Slot character={character} slot={slot} onClickEnhanceItem={this.props.onClickEnhanceItem} />
-                </div>
+                <Slot ref="slot" {...this.state.activeSlot} onClickEnhanceItem={this.onClickEnhanceItem} />
               </div>
             </div>
           </div>
         </div>
         <ModalReport ref="report" />
         <ModalLoad ref="load" />
-        <ModalEnhanced ref="enhance" {...this.state.template.character} slot={this.state.activeSlot} />
+        <ModalEnhanced ref="enhance" slot={this.state.activeSlot} onSelect={this.onSelectEnhanced} />
       </div>
     );
   },
@@ -119,13 +96,18 @@ Spellcraft = ReactMeteor.createClass({
     this.refs.load.show(this.load);
   },
 
+  onClickSlot: function(id) {
+    this.setState({ activeSlot: _.findWhere(AllSlots, { id: id }) });
+  },
+
   onClickEnhanceItem: function(slot) {
     this.refs.enhance.show();
   },
 
-  onClickSlot: function(id) {
-    console.log(id);
-    this.setState({ activeSlot: id });
+  onSelectEnhanced: function(name, bonus) {
+    this.refs.slot.setState({ craftedItemName: name });
+    console.log(this.refs.slot);
+    this.refs.slot.refs.bonus4.setState(bonus);
   }
 
 });

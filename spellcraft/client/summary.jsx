@@ -1,3 +1,5 @@
+var acuityStats = ['Charisma', 'Empathy', 'Intelligence', 'Piety'];
+
 Summary = ReactMeteor.createClass({
 
   templateName: 'Summary',
@@ -11,31 +13,23 @@ Summary = ReactMeteor.createClass({
   },
 
   getMeteorState: function() {
-    var state = Session.get('meta');
-    state.slots = Slots.find({ equipped: true }).fetch().map(function(slot) {
-      slot.bonuses = Bonuses.find({ slot: slot.id, amount: { $gt: 0 } }).fetch();
-      return slot;
+    var state = {};
+    var totals = {};
+    var character = Session.get('character');
+    var castStat = GetCastStatByClass(character.realm, character.class);
+    var skills = GetSkillsByClass(character.realm, character.class);
+    var bonuses = Bonuses.find({ amount: { $gt: 0 } }).map(function(bonus){
+      var key = bonus.type + ' ' + bonus.effect;
+      if(castStat && castStat == bonus.effect && acuityStats.indexOf(bonus.effect) >= 0){
+        key = bonus.type + ' Acuity';
+      }
+      totals[key] ? totals[key] += bonus.amount : totals[key] = bonus.amount;
     });
-    state.skills = GetSkillsByClass(state.realm, state.class);
-    var bonuses = _.flatten(_.pluck(state.slots, 'bonuses'));
-    _.extend(
-      state,
-      this.getEffectTotals('Stat', BonusStat, bonuses),
-      this.getEffectTotals('Skill', state.skills, bonuses),
-      this.getEffectTotals('Cap Increase', BonusStatCap, bonuses),
-      this.getEffectTotals('Resist', BonusResist, bonuses),
-      this.getEffectTotals('Other Bonus', BonusOther, bonuses)
-    );
-    return state;
+
+    return { character: character, totals: totals, skills: skills };
   },
 
   render: function() {
-    var realm = this.state.realm;
-    var race = this.state.race;
-    var clss = this.state.class;
-    var castStats = ['Charisma', 'Empathy', 'Intelligence', 'Piety'];
-    var castStat = GetCastStatByClass(realm, clss);
-
     return (
       <div id="summary">
         <hr/>
@@ -44,7 +38,7 @@ Summary = ReactMeteor.createClass({
         <div className="row">
           <div className="col-xs-6 stats">
             {BonusStat.map(function(effect, i){
-              return (effect != 'Acuity' && (castStats.indexOf(effect) < 0 || castStat == effect)) ? (
+              return acuityStats.indexOf(effect) < 0 ? (
                 <div key={i}>
                   <label>{effect.substr(0,3)}: </label>
                   <span>{this.getCeilingDisplay('Stat', effect)}</span>
@@ -59,7 +53,7 @@ Summary = ReactMeteor.createClass({
                 <div key={i}>
                   <label>{effect}: </label>
                   <span>{this.getCeilingDisplay('Resist', effect)}</span>
-                  <span>{GetRacialResist(realm, race, effect)}</span>
+                  <span>{GetRacialResist(this.state.character.realm, this.state.character.race, effect)}</span>
                 </div>
               );
             }.bind(this))}
@@ -69,7 +63,7 @@ Summary = ReactMeteor.createClass({
         <div className="row">
           <div className="col-xs-12 variant">
             {this.state.skills.map(function(effect, i){
-              return this.state['Skill|' + effect] ? (
+              return this.state.totals['Skill ' + effect] ? (
                 <div key={i}>
                   <label>{effect}: </label>
                   <span>{this.getCeilingDisplay('Skill', effect)}</span>
@@ -78,7 +72,7 @@ Summary = ReactMeteor.createClass({
             }.bind(this))}
             <br/>
             {BonusOther.map(function(effect, i){
-              return this.state['Other Bonus|' + effect] ? (
+              return this.state.totals['Other Bonus ' + effect] ? (
                 <div key={i}>
                   <label>{effect}: </label>
                   <span>{this.getCeilingDisplay('Other Bonus', effect)}</span>
@@ -92,8 +86,9 @@ Summary = ReactMeteor.createClass({
   },
 
   getCeilingDisplay: function(type, effect) {
-    var amtAndCeil = this.getAmountAndCeiling(type, effect);
-    return this.state.fromCeiling ? amtAndCeil[1] - amtAndCeil[0] : amtAndCeil[0];
+    var amount = this.state.totals[type + ' ' + effect] || 0;
+    var ceil = this.getCeiling(this.state.character.level, this.state.totals, type, effect);
+    return this.state.fromCeiling ? ceil - amount : amount;
   }
 
 });
