@@ -10,92 +10,64 @@ ReportGb = ReactMeteor.createClass({
     }
   },
 
-  getMeteorState: function() {
-    var state = Session.get('meta');
-    state.slots = Slots.find({ equipped: true }).fetch().map(function(slot) {
-      slot.bonuses = Bonuses.find({ slot: slot.id, amount: { $gt: 0 } }).fetch();
-      return slot;
-    });
-    state.skills = GetSkillsByClass(state.realm, state.class);
-    var bonuses = _.flatten(_.pluck(state.slots, 'bonuses'));
-    _.extend(
-      state,
-      this.getEffectTotals('Stat', BonusStat, bonuses),
-      this.getEffectTotals('Skill', state.skills, bonuses),
-      this.getEffectTotals('Cap Increase', BonusStatCap, bonuses),
-      this.getEffectTotals('Resist', BonusResist, bonuses),
-      this.getEffectTotals('Other Bonus', BonusOther, bonuses)
-    );
-    return state;
+  'Stat': function(effect) {
+    return <div><label>{effect} : </label><span>{this.state.totals['Stat ' + effect]} / </span>z</div>;
+  },
+
+  'Cap Increase': function(effect) {
+    return <div><label>{effect} Cap : </label><span>{this.state.totals['Cap Increase ' + effect]}</span><span></span></div>;
+  },
+
+  'Resist': function(effect) {
+    var racial = GetRacialResist(this.state.character.realm, this.state.character.race, effect);
+    return <div><label>{effect} Resist: </label><span>{this.state.totals['Resist ' + effect]}</span><span>{racial}</span></div>;
+  },
+
+  'Other Bonus': function(effect) {
+    return <div><label>{effect} : </label><span>{this.state.totals['Other Bonus ' + effect]}</span></div>;
+  },
+
+  'Skill': function(effect) {
+    return <div><label>{effect}: </label><span>{this.state.totals['Skill ' + effect]}</span></div>;
+  },
+
+  output: function(type, effect){
+    return this.state.totals[type + ' ' + effect] ? this[type](effect) : '';
   },
 
   render: function() {
     return (
       <div>
         <p>DAOC Spellcraft Template Report</p>
-        <p>Configuration Name : {this.state.name}</p>
-        <p>Character Class : ({this.state.realm}) {this.state.class}</p>
-        <p>Character Level : {this.state.level}</p>
-        <p>Race : {this.state.race}</p>
+        <p>Configuration Name : {this.state.character.name}</p>
+        <p>Character Class : ({this.state.character.realm}) {this.state.character.class}</p>
+        <p>Character Level : {this.state.character.level}</p>
+        <p>Race : {this.state.character.race}</p>
         <br/>
         <p>&lt;-- Stats --&gt;</p>
-        {this.output('Stat', 'Strength')}
-        {this.output('Stat', 'Constitition')}
-        {this.output('Stat', 'Dexterity')}
-        {this.output('Stat', 'Quickness')}
-        {this.output('Stat', 'Acuity')}
-        {this.output('Stat', 'Hits')}
-        {this.output('Stat', 'Power')}
+        {BonusStat.map(this.output.bind(this, 'Stat'))}
         <br />
         <p>&lt;-- Stat Cap Increases --&gt;</p>
-        {this.output('Cap Increase', 'Strength')}
-        {this.output('Cap Increase', 'Constitition')}
-        {this.output('Cap Increase', 'Dexterity')}
-        {this.output('Cap Increase', 'Quickness')}
-        {this.output('Cap Increase', 'Acuity')}
-        {this.output('Cap Increase', 'Hits')}
-        {this.output('Cap Increase', 'Power')}
+        {BonusStat.map(this.output.bind(this, 'Cap Increase'))}
         <br/>
         <p>&lt;-- Resists --&gt;</p>
-        {this.output('Resist', 'Crush')}
-        {this.output('Resist', 'Slash')}
-        {this.output('Resist', 'Thrust')}
-        {this.output('Resist', 'Heat')}
-        {this.output('Resist', 'Cold')}
-        {this.output('Resist', 'Matter')}
-        {this.output('Resist', 'Energy')}
-        {this.output('Resist', 'Body')}
-        {this.output('Resist', 'Spirit')}
+        {BonusResist.map(this.output.bind(this, 'Resist'))}
         <br/>
         <p>&lt;-- ToA Bonuses --&gt;</p>
-        {this.output('Other Bonus', 'Archery and Casting Speed')}
-        {this.output('Other Bonus', 'Archery and Spell Range')}
-        {this.output('Other Bonus', 'Archery and Spell Damage')}
-        {this.output('Other Bonus', 'Melee Combat Speed')}
-        {this.output('Other Bonus', 'Melee Damage')}
-        {this.output('Other Bonus', 'Style Damage')}
-        {this.output('Other Bonus', 'Resist Pierce')}
-        {this.output('Other Bonus', 'AF')}
-        {this.output('Other Bonus', 'Stat Buff Effectiveness')}
-        {this.output('Other Bonus', 'Stat Debuff Effectiveness')}
-        {this.output('Other Bonus', 'Healing Effectiveness')}
-        {this.output('Other Bonus', 'Duration of Spells')}
-        {this.output('Other Bonus', '% Power Pool')}
-        {this.output('Other Bonus', 'Fatigue')}
+        {BonusOther.map(this.output.bind(this, 'Other Bonus'))}
         <br/>
         <p>&lt;-- Skills --&gt;</p>
-        {this.state.skills.map(function(effect, i){
-          return this.output('Skill', effect, i);
-        }.bind(this))}
+        {this.state.skills.map(this.output.bind(this, 'Skill'))}
         <br/>
         <p>&lt;== Equipment Info ==&gt;</p>
         <br/>
-        {this.state.slots.map(function(slot){
-          if(slot.bonuses.length){
+        {Slots.find().map(function(slot){
+          var bonuses = Bonuses.find({ slotid: slot._id, amount: { $gt: 0 } });
+          if(bonuses.count()){
             return (
               <div>
                 <p>( {slot.name} ) : {slot.crafted ? slot.craftedItemName : slot.itemName}</p>
-                {slot.bonuses.map(function(bonus){
+                {bonuses.map(function(bonus){
                   return <p>{bonus.amount} {bonus.effect}</p>;
                 })}
                 <br />

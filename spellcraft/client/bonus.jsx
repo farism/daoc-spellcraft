@@ -8,7 +8,6 @@ Bonus = ReactMeteor.createClass({
 
   getMeteorState: function() {
     return {
-      slot: Slots.findOne({ _id: this.props.slotid }),
       character: Session.get('character')
     };
   },
@@ -20,7 +19,6 @@ Bonus = ReactMeteor.createClass({
   render: function() {
     var realm = this.state.character.realm;
     var clss = this.state.character.class;
-    var slot = this.state.slot;
     var effects = this.state.type == 'Skill' ? GetSkillEffects(realm, clss) : BonusEffectsMap[this.state.type] || [];
     var amounts = GetAmounts(this.state.type, this.state.effect);
     var amount = amounts[this.state.amountIndex - 1] || '';
@@ -41,13 +39,13 @@ Bonus = ReactMeteor.createClass({
           <select name="effect" value={this.state.effect} onChange={this.onChangeEffect}>
             <option value="">-effect-</option>
             {effects.map(function(effect, i) {
-              return !(slot.crafted && effect == 'Acuity') ? <option value={effect} key={i}>{effect}</option> : '';
+              return !(this.props.crafted && effect == 'Acuity') ? <option value={effect} key={i}>{effect}</option> : '';
             }.bind(this))}
           </select>
         </div>
 
         <div className="col-xs-2">
-          {slot.crafted ? (
+          {this.props.crafted ? (
             <select name="amount" value={amount} onChange={this.onChangeAmount}>
               <option value="">-value-</option>
               {amounts.map(function(value, i) {
@@ -60,8 +58,8 @@ Bonus = ReactMeteor.createClass({
         </div>
 
         <div className="col-xs-4 imbue">
-          {!slot.crafted ? '' : (
-            <span>{this.state.imbue.toFixed(1)}</span>
+          {!this.props.crafted ? '' : (
+            <span>{this.props.imbueAdjusted.toFixed(1)}</span>
           )}
 
           {GetGemName(this.state.type, this.state.effect, this.state.amountIndex)}
@@ -86,7 +84,10 @@ Bonus = ReactMeteor.createClass({
   },
 
   onChangeAmount: function(e){
-    this.setState({ amount: parseInt($(e.target).val(), 10) || 0, amountIndex: $(e.target).prop('selectedIndex') });
+    var amount = parseInt($(e.target).val(), 10) || 0;
+    var amountIndex = $(e.target).prop('selectedIndex');
+    var imbue = CalculateBonusImbue(this.state.type, this.state.effect, amount, amountIndex) / 2;
+    this.setState({ amount: amount, amountIndex: amountIndex, imbue: imbue  });
   }
 
 });

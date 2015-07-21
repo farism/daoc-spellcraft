@@ -14,9 +14,10 @@ GetDefaultSlot = function(slot){
   };
 };
 
-GetDefaultBonus = function(slotid){
+GetDefaultBonus = function(slotid, index){
   return {
     slotid: slotid,
+    index: index,
     type: '',
     effect: '',
     amount: 0,

@@ -47,16 +47,20 @@ Spellcraft = ReactMeteor.createClass({
             <div className="col-sm-9">
               <div id="slots">
                 <ul id="tabs" className="nav nav-pills">
-                  {Slots.find().fetch().map(function(slot, i){
+                  {Slots.find().map(function(slot, i){
                     return (
-                      <li className={this.state.activeSlot.id == slot.id ? 'active' : ''} onClick={this.onClickSlot.bind(this, slot.id)} key={i}>
+                      <li className={this.state.activeSlot._id == slot._id ? 'active' : ''} onClick={this.onClickSlot.bind(this, slot._id)} key={i}>
                         <a>{slot.name}</a>
                       </li>
                     );
                   }.bind(this))}
                 </ul>
                 <br/>
-                <Slot ref="slot" {...this.state.activeSlot} onClickEnhanceItem={this.onClickEnhanceItem} />
+                {Slots.find().map(function(slot, i){
+                  if(slot._id == this.state.activeSlot._id){
+                    return <Slot ref="slot" _id={slot._id} onClickSlot={this.onClickSlot} onClickEnhanceItem={this.onClickEnhanceItem} key={i} />;
+                  }
+                }.bind(this))}
               </div>
             </div>
           </div>
@@ -96,8 +100,8 @@ Spellcraft = ReactMeteor.createClass({
     this.refs.load.show(this.load);
   },
 
-  onClickSlot: function(id) {
-    this.setState({ activeSlot: _.findWhere(AllSlots, { id: id }) });
+  onClickSlot: function(_id) {
+    this.setState({ activeSlot: Slots.findOne({ _id: _id }) });
   },
 
   onClickEnhanceItem: function(slot) {
@@ -106,7 +110,6 @@ Spellcraft = ReactMeteor.createClass({
 
   onSelectEnhanced: function(name, bonus) {
     this.refs.slot.setState({ craftedItemName: name });
-    console.log(this.refs.slot);
     this.refs.slot.refs.bonus4.setState(bonus);
   }
 

@@ -1,5 +1,22 @@
 ReportMixin = {
 
+  getMeteorState: function() {
+    var state = {};
+    var totals = {};
+    var character = Session.get('character');
+    var castStat = GetCastStatByClass(character.realm, character.class);
+    var skills = GetSkillsByClass(character.realm, character.class);
+    var bonuses = Bonuses.find({ amount: { $gt: 0 } }).map(function(bonus){
+      var key = bonus.type + ' ' + bonus.effect;
+      if(castStat && castStat == bonus.effect && acuityStats.indexOf(bonus.effect) >= 0){
+        key = bonus.type + ' Acuity';
+      }
+      totals[key] ? totals[key] += bonus.amount : totals[key] = bonus.amount;
+    });
+
+    return { character: character, totals: totals, skills: skills };
+  },
+
   getCeiling: function(level, totals, type, effect){
     var ceiling = this.calculateCap(type + ' ' + effect, level) || this.calculateCap(effect, level) || this.calculateCap(type, level);
 

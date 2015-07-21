@@ -2,13 +2,11 @@ ReportCrafting = ReactMeteor.createClass({
 
   templateName: 'ReportCrafting',
 
-  mixins: [ReportMixin],
-
   getMeteorState: function() {
     var gemArr = [];
-    var state = Session.get('meta');
+    var state = Session.get('character');
     state.slots = Slots.find({ crafted: true }).fetch().map(function(slot) {
-      slot.bonuses = Bonuses.find({ slot: slot.id, amountIndex: { $gt: 0 } }).fetch();
+      slot.bonuses = Bonuses.find({ slotid: slot._id, amountIndex: { $gt: 0 } }).fetch();
       return slot;
     });
     state.gems = {};
