@@ -7,13 +7,9 @@ Bonus = ReactMeteor.createClass({
   },
 
   getMeteorState: function() {
-    return {
-      character: Session.get('character')
-    };
-  },
-
-  componentDidUpdate: function(prevState) {
-    Bonuses.update({ _id: this.state._id }, { $set: _.omit(this.state, '_id') });
+    var state = Bonuses.findOne({ _id: this.props._id });
+    state.character = Session.get('character');
+    return state;
   },
 
   render: function() {
@@ -24,7 +20,7 @@ Bonus = ReactMeteor.createClass({
     var amount = amounts[this.state.amountIndex - 1] || '';
 
     return (
-      <div className={classNames({ row: 1, bonus: 1, error: this.props.error })}>
+      <div className="row bonus">
 
         <div className="col-xs-3">
           <select name="type" value={this.state.type} onChange={this.onChangeType}>
@@ -70,7 +66,7 @@ Bonus = ReactMeteor.createClass({
 
   onChangeType: function(e){
     var state = { type: $(e.target).val(), effect: '', amount: '', amountIndex: 0, imbue: 0 };
-    this.setState(state);
+    Bonuses.update({ _id: this.props._id }, { $set: state });
   },
 
   onChangeEffect: function(e){
@@ -80,14 +76,15 @@ Bonus = ReactMeteor.createClass({
     } else {
       var state = { effect: effect, amount: '', amountIndex: 0, imbue: 0 };
     }
-    this.setState(state);
+    Bonuses.update({ _id: this.props._id }, { $set: state });
   },
 
   onChangeAmount: function(e){
     var amount = parseInt($(e.target).val(), 10) || 0;
     var amountIndex = $(e.target).prop('selectedIndex');
     var imbue = CalculateBonusImbue(this.state.type, this.state.effect, amount, amountIndex) / 2;
-    this.setState({ amount: amount, amountIndex: amountIndex, imbue: imbue  });
+    var state = { amount: amount, amountIndex: amountIndex, imbue: imbue  };
+    Bonuses.update({ _id: this.props._id }, { $set: state });
   }
 
 });

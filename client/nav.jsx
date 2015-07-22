@@ -60,6 +60,7 @@ Nav = ReactMeteor.createClass({
     if(this.state.user){
       return (
         <ul className="dropdown-menu">
+          <li><a href="#">{Meteor.user().emails[0].address}</a></li>
           <li><a href="/my-characters">My Characters</a></li>
           <li><a href="/my-templates">My Templates</a></li>
           <li><a href="#" onClick={this.onClickLogout}>Sign Out</a></li>

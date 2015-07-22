@@ -17,7 +17,9 @@ ReportMixin = {
     return { character: character, totals: totals, skills: skills };
   },
 
-  getCeiling: function(level, totals, type, effect){
+  getCeiling: function(type, effect){
+    var level = this.state.level || 50;
+    var totals = this.state.totals || {};
     var ceiling = this.calculateCap(type + ' ' + effect, level) || this.calculateCap(effect, level) || this.calculateCap(type, level);
 
     if(type == 'Stat'){

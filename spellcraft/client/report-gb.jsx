@@ -11,24 +11,24 @@ ReportGb = ReactMeteor.createClass({
   },
 
   'Stat': function(effect) {
-    return <div><label>{effect} : </label><span>{this.state.totals['Stat ' + effect]} / </span>z</div>;
+    return <div>{effect} : {this.state.totals['Stat ' + effect]} / {this.getCeiling('Stat', effect)}</div>;
   },
 
   'Cap Increase': function(effect) {
-    return <div><label>{effect} Cap : </label><span>{this.state.totals['Cap Increase ' + effect]}</span><span></span></div>;
+    return <div>{effect} Cap : {this.state.totals['Cap Increase ' + effect]} / {this.getCeiling('Cap Increase', effect)}</div>;
   },
 
   'Resist': function(effect) {
     var racial = GetRacialResist(this.state.character.realm, this.state.character.race, effect);
-    return <div><label>{effect} Resist: </label><span>{this.state.totals['Resist ' + effect]}</span><span>{racial}</span></div>;
+    return <div>{effect} Resist : {this.state.totals['Resist ' + effect]}</div>;
   },
 
   'Other Bonus': function(effect) {
-    return <div><label>{effect} : </label><span>{this.state.totals['Other Bonus ' + effect]}</span></div>;
+    return <div>{effect} : {this.state.totals['Other Bonus ' + effect]}</div>;
   },
 
   'Skill': function(effect) {
-    return <div><label>{effect}: </label><span>{this.state.totals['Skill ' + effect]}</span></div>;
+    return <div>{effect} : {this.state.totals['Skill ' + effect]}</div>;
   },
 
   output: function(type, effect){
@@ -61,14 +61,14 @@ ReportGb = ReactMeteor.createClass({
         <br/>
         <p>&lt;== Equipment Info ==&gt;</p>
         <br/>
-        {Slots.find().map(function(slot){
+        {Slots.find().map(function(slot, i){
           var bonuses = Bonuses.find({ slotid: slot._id, amount: { $gt: 0 } });
           if(bonuses.count()){
             return (
-              <div>
+              <div key={i}>
                 <p>( {slot.name} ) : {slot.crafted ? slot.craftedItemName : slot.itemName}</p>
-                {bonuses.map(function(bonus){
-                  return <p>{bonus.amount} {bonus.effect}</p>;
+                {bonuses.map(function(bonus, i){
+                  return <p key={i}>{bonus.amount} {bonus.effect} {bonus.type == 'Cap Increase' ? 'Cap' : ''}</p>;
                 })}
                 <br />
               </div>

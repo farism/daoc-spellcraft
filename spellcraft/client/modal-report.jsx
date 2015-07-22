@@ -23,7 +23,7 @@ ModalReport = ReactMeteor.createClass({
           <div className="modal-content">
             <div className="modal-header">
               <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 className="modal-title">Modal title</h4>
+              <h4 className="modal-title">Template Report</h4>
             </div>
             <div className="modal-body">
               <label><input type="radio" name="style" value="0" checked={this.state.style == 0} onChange={this.onChangeStyle} />GearBunny</label>

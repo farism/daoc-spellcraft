@@ -4,38 +4,34 @@ Slot = ReactMeteor.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 
+  getInitialState: function() {
+    return Slots.findOne({ _id: this.props._id });
+  },
+
   getMeteorState: function() {
     var state = Slots.findOne({ _id: this.props._id });
-    return state;
-  },
-
-  componentDidUpdate: function() {
-    Slots.update({ _id: this.state._id }, { $set: _.omit(this.state, '_id') });
-  },
-
-  render: function() {
-    var imbueArr = _.range(0,4).map(function(i){
-      var bonus = this.refs['bonus' + i];
-      return bonus ? bonus.state.imbue : 0;
-    }.bind(this));
-
-    imbueArr[imbueArr.indexOf(_.max(imbueArr))] = _.max(imbueArr) * 2;
-
-    var imbuePoints = imbueArr.reduce(function(prev, cur){
+    state.bonuses = Bonuses.find({ slotid: this.props._id }).fetch();
+    state.imbueArr = _.pluck(state.bonuses.slice(0, 4), 'imbue');
+    state.imbueArr[state.imbueArr.indexOf(_.max(state.imbueArr))] = _.max(state.imbueArr) * 2;
+    state.imbuePoints = state.imbueArr.reduce(function(prev, cur){
       return prev + cur;
     }, 0);
 
+    return state;
+  },
+
+  render: function() {
     return (
       <div className="slot">
 
         <div className="row">
           <div className="col-xs-12 crafted">
             {this.state.id >= 9 ? (
-              <label><input type="checkbox" checkedLink={this.linkState('crafted')} />Crafted</label>
+              <label><input type="checkbox" checked={this.state.crafted} onChange={this.onChangeCrafted} />Crafted</label>
             ) : ''}
 
             {this.state.id >= 16 ? (
-              <label><input type="checkbox" checkedLink={this.linkState('equipped')} />Equipped</label>
+              <label><input type="checkbox" checked={this.state.equipped} onChange={this.onChangeEquipped} />Equipped</label>
             ) : ''}
           </div>
         </div>
@@ -49,7 +45,7 @@ Slot = ReactMeteor.createClass({
                 ) : ''}
 
                 {this.state.crafted ? (
-                  <span className="item-imbue">{imbuePoints.toFixed(1)} / {GetImbueCeiling(this.state.level).toFixed(1)}</span>
+                  <span className="item-imbue">{this.state.imbuePoints.toFixed(1)} / {GetImbueCeiling(this.state.level).toFixed(1)}</span>
                 ) : ''}
 
                 {this.state.crafted ? (
@@ -67,21 +63,17 @@ Slot = ReactMeteor.createClass({
           </div>
         </div>
 
-        {Bonuses.find({ slotid: this.state._id }).fetch().slice(0, this.state.crafted ? 5 : 10).map(function(bonus, i){
+        {this.state.bonuses.slice(0, this.state.crafted ? 5 : 10).map(function(bonus, i){
           if(this.state.crafted && i == 4){
             return <EnhancedBonus ref={'bonus' + i} crafted={this.state.crafted} {...bonus} key={i} />;
           } else {
-            return <Bonus ref={'bonus' + i} crafted={this.state.crafted} imbueAdjusted={imbueArr[i]} {...bonus} key={i} />;
+            return <Bonus ref={'bonus' + i} crafted={this.state.crafted} imbueAdjusted={this.state.imbueArr[i]} {...bonus} key={i} />;
           }
         }.bind(this))}
 
         <div className="enhanced-actions">
           {this.state.crafted ? (
             <button className="btn btn-default" onClick={this.onClickEnhanced}>Enhanced Bonus</button>
-          ) : ''}
-
-          {this.state.enhanced ? (
-            <button className="btn btn-default" onClick={this.onClickEnhancedClear}>Clear Enhanced</button>
           ) : ''}
         </div>
 
@@ -109,11 +101,11 @@ Slot = ReactMeteor.createClass({
                 <a href="#">{op.label}</a>
                 <ul className="dropdown-menu">
                   {Slots.find().map(function(slot, j){
-                    return (
-                      <li onClick={op.cb.bind(this, slot._id)} key={j}>
+                    return !this.state.crafted || (this.state.crafted && slot.id >= 9) ? (
+                      <li onClick={op.cb.bind(this, slot)} key={j}>
                         <a href="#">{slot.id == 4 || slot.id == 6 ? 'L. ' : ''} {slot.id == 5 || slot.id == 7 ? 'R. ' : ''} {slot.name}</a>
                       </li>
-                    );
+                    ) : '';
                   }.bind(this))}
                 </ul>
               </li>
@@ -125,19 +117,18 @@ Slot = ReactMeteor.createClass({
   },
 
   reset: function() {
-    this.setState(_.omit(GetDefaultSlot(this.state), 'crafted'));
-    _.range(0,10).map(function(i){
-      var bonus = this.refs['bonus' + i];
-      if(bonus) bonus.setState(GetDefaultBonus(this.state._id, i));
+    Slots.update({ _id: this.props._id }, { $set: _.omit(GetDefaultSlot(this.state)) });
+    Bonuses.find({ slotid: this.props._id }).map(function(bonus){
+      Bonuses.update({ _id: bonus._id }, { $set: GetDefaultBonus(this.props._id, bonus.index) });
     }.bind(this));
   },
 
-  copy: function(slotid) {
-    Slots.update({ _id: slotid }, { $set: _.omit(this.state, '_id', 'id', 'name') });
-    Bonuses.find({ slotid: this.state._id }).map(function(bonus){
-      Bonuses.update({ slotid: slotid, index: bonus.index }, { $set: _.omit(bonus, '_id', 'slotid') });
+  copy: function(slot) {
+    Slots.update({ _id: slot._id }, { $set: _.omit(this.state, '_id', 'id', 'name') });
+    Bonuses.find({ slotid: this.props._id }).map(function(bonus){
+      Bonuses.update({ slotid: slot._id, index: bonus.index }, { $set: _.omit(bonus, '_id', 'slotid') });
     });
-    this.props.onClickSlot(slotid);
+    this.props.onClickSlot(slot._id);
   },
 
   save: function() {
@@ -165,18 +156,25 @@ Slot = ReactMeteor.createClass({
     this.reset();
   },
 
+  onChangeCrafted: function(e) {
+    Slots.update({ _id: this.props._id }, { $set: { crafted: $(e.target).prop('checked') } });
+  },
+
+  onChangeEquipped: function(e) {
+    Slots.update({ _id: this.props._id }, { $set: { equipped: $(e.target).prop('checked') } });
+  },
+
   onChangeLevel: function(e) {
-    var lvl = parseInt($(e.target).val(), 10) || 1;
-    this.setState({ level: Math.min(51, Math.max(1, lvl)) });
+    Slots.update({ _id: this.props._id }, { $set: { level: Math.min(51, Math.max(1, parseInt($(e.target).val(), 10) || 1)) } });
   },
 
   onChangeSearch: function(val) {
-    this.setState({ itemName: val });
+    Slots.update({ _id: this.props._id }, { $set: { itemName: val } });
   },
 
   onSelectSearch: function(item) {
     this.reset();
-    Slots.update({ _id: this.state._id }, { $set: { itemName: item.itemname } });
+    Slots.update({ _id: this.props._id }, { $set: { itemName: item.itemname } });
     _.range(0,10).map(function(i){
       var from = item.dropitem[i];
       var to = this.refs['bonus' + i];
@@ -184,17 +182,13 @@ Slot = ReactMeteor.createClass({
         from.amount = parseInt(from.amount, 10);
         if(to) to.setState(from);
       } else {
-        if(to) to.setState(GetDefaultBonus(this.state._id, i));
+        if(to) to.setState(GetDefaultBonus(this.props._id, i));
       }
     }.bind(this));
   },
 
   onClickEnhanced: function(e) {
     this.props.onClickEnhanceItem(this.props._id);
-  },
-
-  onClickEnhancedClear: function() {
-    // Bonuses.update({ _id: this.props.bonuses[4]._id }, { $set: GetDefaultBonus(this.props._id) });
   }
 
 });

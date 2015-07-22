@@ -40,6 +40,8 @@ Spellcraft = ReactMeteor.createClass({
                 <button onClick={this.onClickSave} title="Save"><span className="glyphicon glyphicon-floppy-disk" /></button>
                 <button onClick={this.onClickDuplicate} title="Duplicate"><span className="glyphicon glyphicon-transfer" /></button>
                 <button onClick={this.onClickLoad} title="Load"><span className="glyphicon glyphicon-folder-open" /></button>
+                <button onClick={this.onClickFavorite} title="Favorite"><span className="glyphicon glyphicon-heart" /></button>
+                <button onClick={this.onClickRate} title="Rate"><span className="glyphicon glyphicon-star" /></button>
               </div>
               <Meta />
               <Summary />
@@ -72,32 +74,48 @@ Spellcraft = ReactMeteor.createClass({
     );
   },
 
-  save: function() {
-    console.log('save temp', this.state);
-  },
-
-  duplicate: function() {
-    console.log('duplicate temp', this.state);
-  },
-
-  load: function(id) {
-    console.log('sc load', id);
-  },
-
   onClickReport: function(e) {
     this.refs.report.show();
+  },
+
+  save: function() {
+    console.log('save temp', this.state);
   },
 
   onClickSave: function(e) {
     Meteor.user() ? this.save() : this.refs.nav.refs.login.show(this.save);
   },
 
+  duplicate: function() {
+    console.log('duplicate temp', this.state);
+  },
+
   onClickDuplicate: function(e) {
     Meteor.user() ? this.save() : this.refs.nav.refs.login.show(this.duplicate);
   },
 
+  load: function(id) {
+    console.log('sc load', id);
+  },
+
   onClickLoad: function(e) {
     this.refs.load.show(this.load);
+  },
+
+  favorite: function(){
+
+  },
+
+  onClickFavorite: function(e) {
+    Meteor.user() ? this.favorite() : this.refs.nav.refs.login.show(this.favorite);
+  },
+
+  rate: function(){
+
+  },
+
+  onClickRate: function(e) {
+
   },
 
   onClickSlot: function(_id) {

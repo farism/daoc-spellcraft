@@ -70,7 +70,7 @@ Summary = ReactMeteor.createClass({
 
   getCeilingDisplay: function(type, effect) {
     var amount = this.state.totals[type + ' ' + effect] || 0;
-    var ceil = this.getCeiling(this.state.character.level, this.state.totals, type, effect);
+    var ceil = this.getCeiling(type, effect);
     return this.state.fromCeiling ? ceil - amount : amount;
   }
 
