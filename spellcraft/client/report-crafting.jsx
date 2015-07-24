@@ -4,7 +4,7 @@ ReportCrafting = ReactMeteor.createClass({
 
   getMeteorState: function() {
     var gemArr = [];
-    var state = Session.get('character');
+    var state = Session.get('template');
     state.slots = Slots.find({ crafted: true }).fetch().map(function(slot) {
       slot.bonuses = Bonuses.find({ slotid: slot._id, amountIndex: { $gt: 0 } }).fetch();
       return slot;
@@ -56,7 +56,7 @@ ReportCrafting = ReactMeteor.createClass({
           if(slot.bonuses.length){
             return (
               <div key={i}>
-                <p>{slot.name} - {slot.craftedItemName}</p>
+                <p>{slot.slot} - {slot.craftedItemName}</p>
                 {slot.bonuses.map(function(bonus) {
                   return <p>{GetGemName(bonus.type, bonus.effect, bonus.amountIndex)}</p>
                 })}

@@ -8,15 +8,16 @@ Bonus = ReactMeteor.createClass({
 
   getMeteorState: function() {
     var state = Bonuses.findOne({ _id: this.props._id });
-    state.character = Session.get('character');
+    state.template = Session.get('template');
     return state;
   },
 
   render: function() {
-    var realm = this.state.character.realm;
-    var clss = this.state.character.class;
+    var realm = this.state.template.realm;
+    var clss = this.state.template.class;
+    var newstats = this.state.template.newstats;
     var effects = this.state.type == 'Skill' ? GetSkillEffects(realm, clss) : BonusEffectsMap[this.state.type] || [];
-    var amounts = GetAmounts(this.state.type, this.state.effect);
+    var amounts = GetAmounts(this.state.type, this.state.effect, newstats);
     var amount = amounts[this.state.amountIndex - 1] || '';
 
     return (
@@ -55,7 +56,7 @@ Bonus = ReactMeteor.createClass({
 
         <div className="col-xs-4 imbue">
           {!this.props.crafted ? '' : (
-            <span>{this.props.imbueAdjusted.toFixed(1)}</span>
+            <span>{(this.props.imbueAdjusted / 2).toFixed(1)}</span>
           )}
 
           {GetGemName(this.state.type, this.state.effect, this.state.amountIndex)}
@@ -82,7 +83,7 @@ Bonus = ReactMeteor.createClass({
   onChangeAmount: function(e){
     var amount = parseInt($(e.target).val(), 10) || 0;
     var amountIndex = $(e.target).prop('selectedIndex');
-    var imbue = CalculateBonusImbue(this.state.type, this.state.effect, amount, amountIndex) / 2;
+    var imbue = CalculateBonusImbue(this.state.type, this.state.effect, amount, this.state.template.newstats);
     var state = { amount: amount, amountIndex: amountIndex, imbue: imbue  };
     Bonuses.update({ _id: this.props._id }, { $set: state });
   }

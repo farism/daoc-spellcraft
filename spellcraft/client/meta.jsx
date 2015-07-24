@@ -4,12 +4,8 @@ Meta = ReactMeteor.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 
-  getInitialState: function() {
-    return Session.get('character');
-  },
-
-  componentDidUpdate: function(prevState) {
-    Session.set('character', this.state);
+  getMeteorState: function() {
+    return Session.get('template');
   },
 
   render: function() {
@@ -36,24 +32,29 @@ Meta = ReactMeteor.createClass({
     );
   },
 
+
   onChangeRealm: function(e) {
     var realm = $(e.target).val();
     var clss = GetClassesByRealm(realm)[0].name;
     var race = GetRacesByClass(realm, clss)[0].name;
-    this.setState({ realm: realm, class: clss, race: race });
+    var state = { realm: realm, class: clss, race: race };
+    Session.set('template', _.extend(Session.get('template'), state));
   },
 
   onChangeClass: function(e) {
     var clss = $(e.target).val();
-    this.setState({ class: clss, race: GetRacesByClass(this.state.realm, clss)[0].name });
+    var state = { class: clss, race: GetRacesByClass(this.state.realm, clss)[0].name };
+    Session.set('template', _.extend(Session.get('template'), state));
   },
 
   onChangeRace: function(e) {
-    this.setState({ race: $(e.target).val() });
+    var state = { race: $(e.target).val() };
+    Session.set('template', _.extend(Session.get('template'), state));
   },
 
   onChangeLevel: function(e) {
-    this.setState({ level: Math.min(50, Math.max(1, parseInt($(e.target).val(), 10))) });
+    var state = { level: Math.min(50, Math.max(1, parseInt($(e.target).val(), 10))) };
+    Session.set('template', _.extend(Session.get('template'), state));
   }
 
 });

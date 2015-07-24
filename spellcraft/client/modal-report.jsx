@@ -1,6 +1,6 @@
 ModalReport = ReactMeteor.createClass({
 
-  templateName: 'ReportModal',
+  templateName: 'ModalReport',
 
   mixins: [React.addons.LinkedStateMixin],
 
@@ -18,7 +18,7 @@ ModalReport = ReactMeteor.createClass({
 
   render: function() {
     return (
-      <div ref="modal" id="report-modal" className="modal fade">
+      <div ref="modal" id="modal-report" className="modal fade">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">

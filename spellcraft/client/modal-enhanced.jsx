@@ -9,9 +9,9 @@ ModalEnhanced = ReactMeteor.createClass({
   },
 
   getMeteorState: function() {
-    var character = Session.get('character');
+    var template = Session.get('template');
     return {
-      gear: GetEnhancedBonusesBySlot(character.realm, character.class, this.props.slot.id)
+      gear: GetEnhancedBonusesBySlot(template.realm, template.class, this.props.slot.id)
     };
   },
 
@@ -21,7 +21,7 @@ ModalEnhanced = ReactMeteor.createClass({
 
   render: function() {
     return (
-      <div ref="modal" id="enhanced-modal" className="modal fade">
+      <div ref="modal" id="modal-enhanced" className="modal fade">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -37,7 +37,7 @@ ModalEnhanced = ReactMeteor.createClass({
                   </tr>
                   {this.state.gear.map(function(gear, i){
                     return (
-                      <tr className={this.state.selected == i ? 'selected' : ''} onClick={this.onClickGear.bind(this, i)} onDoubleClick={this.onDoubleClickGear.bind(this, i)} key={i}>
+                      <tr className={this.state.selected == i ? 'selected' : ''} onClick={this.onClick.bind(this, i)} onDoubleClick={this.onDoubleClick.bind(this, i)} key={i}>
                         <td>{gear.name}</td>
                         <td>{gear.value}</td>
                       </tr>
@@ -65,11 +65,11 @@ ModalEnhanced = ReactMeteor.createClass({
     this.setState({ selected: -1 });
   },
 
-  onClickGear: function(i, e){
+  onClick: function(i, e){
     this.setState({ selected: i });
   },
 
-  onDoubleClickGear: function(i, e){
+  onDoubleClick: function(i, e){
     this.setEnhancedBonus(this.state.gear[i]);
     this.hide();
   },

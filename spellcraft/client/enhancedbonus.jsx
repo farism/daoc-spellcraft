@@ -2,12 +2,8 @@ EnhancedBonus = ReactMeteor.createClass({
 
   templateName: 'EnhancedBonus',
 
-  getInitialState: function() {
+  getMeteorState: function() {
     return Bonuses.findOne({ _id: this.props._id });
-  },
-
-  componentDidUpdate: function(prevState) {
-    Bonuses.update({ _id:this.props._id }, { $set: _.omit(this.state, '_id') });
   },
 
   render: function() {

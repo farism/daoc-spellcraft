@@ -2,6 +2,7 @@ GetDefaultSlot = function(slot){
   return {
     id: slot.id,
     name: slot.name,
+    slot: slot.name,
     crafted: slot.id >= 9,
     itemName: '',
     craftedItemName: 'Crafted',
@@ -85,7 +86,8 @@ GetSkillsByClass = function(realm, clss){
   });
 };
 
-GetAmounts = function(type, effect){
+GetAmounts = function(type, effect, newstats){
+  if(type == 'Stat' && newstats) type == 'Stat2';
   return (CraftedBonusTypeValues[effect] || CraftedBonusTypeValues[type]) || [];
 };
 
@@ -159,7 +161,7 @@ GetImbueCeiling = function(level){
   return ImbueTotals[parseInt(level, 10) - 1];
 };
 
-CalculateBonusImbue = function(type, effect, amount, amountIndex){
+CalculateBonusImbue = function(type, effect, amount, newstats){
   amount = parseInt(amount, 10) || 0;
   var imbue = 0;
 
@@ -169,7 +171,11 @@ CalculateBonusImbue = function(type, effect, amount, amountIndex){
     } else if(effect == 'Power') {
       imbue = (amount - 1) * 2;
     } else {
-      imbue = [1, 3, 5, 6, 8, 10, 12, 13, 15, 17][amountIndex - 1] || 0;
+      if(newstats){
+        imbue = Math.floor(amount / 1.725);
+      } else {
+        imbue = Math.ceil(amount * 2 / 3);
+      }
     }
   } else if(type == 'Resist'){
     imbue = (amount - 1) * 2;

@@ -28,7 +28,8 @@ ImbueTotals = [
 ];
 
 CraftedBonusTypeValues = {
-  'Stat':   [2, 5, 8, 11, 14, 17, 20, 23, 26, 29],
+  'Stat':   [1, 4, 7, 10, 13, 16, 19, 22, 25, 28],
+  'Stat2':   [2, 5, 8, 11, 14, 17, 20, 23, 26, 29],
   'Hits':   [4, 12, 20, 28, 36, 44, 52, 60, 68, 76],
   'Resist': [1, 2, 3, 5, 7, 9, 11, 13, 15, 17],
   'Power':  [1, 2, 3, 5, 7, 9, 11, 13, 15, 17],
@@ -82,6 +83,13 @@ BonusSecondary = [
 ]
 
 BonusOther = BonusPrimary.concat(BonusSecondary);
+
+AcuityStats = [
+  'Charisma',
+  'Empathy',
+  'Intelligence',
+  'Piety'
+];
 
 BonusStat = [
   'Strength',

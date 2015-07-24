@@ -21,7 +21,7 @@ Loading = ReactMeteor.createClass({
   getMeteorState: function() {
     return {
       itemProgress: Math.min(100, (Items.find().count() / this.state.totalItems) * 100),
-      templateProgress: Math.min(100, (Templates.find().count() / this.state.totalTemplates) * 100)
+      templateProgress: Math.min(100, (TemplatesNew.find().count() / this.state.totalTemplates) * 100)
     };
   },
 

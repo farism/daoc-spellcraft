@@ -12,11 +12,9 @@ Slot = ReactMeteor.createClass({
     var state = Slots.findOne({ _id: this.props._id });
     state.bonuses = Bonuses.find({ slotid: this.props._id }).fetch();
     state.imbueArr = _.pluck(state.bonuses.slice(0, 4), 'imbue');
-    state.imbueArr[state.imbueArr.indexOf(_.max(state.imbueArr))] = _.max(state.imbueArr) * 2;
-    state.imbuePoints = state.imbueArr.reduce(function(prev, cur){
-      return prev + cur;
-    }, 0);
-
+    var max = _.max(state.imbueArr);
+    state.imbuePoints = (state.imbueArr.reduce(function(p, c){ return p + c; }, 0) + max) / 2;
+    state.imbueArr[state.imbueArr.indexOf(max)] += max;
     return state;
   },
 
@@ -53,7 +51,7 @@ Slot = ReactMeteor.createClass({
                 ) : ''}
 
                 {!this.state.crafted ? (
-                  <ItemSearch location={this.state.name} value={this.state.itemName} onChange={this.onChangeSearch} onSelect={this.onSelectSearch} />
+                  <ItemSearch location={this.state.slot} value={this.state.itemName} onChange={this.onChangeSearch} onSelect={this.onSelectSearch} />
                 ) : ''}
               </div>
               <div className="col-xs-2">
@@ -103,7 +101,7 @@ Slot = ReactMeteor.createClass({
                   {Slots.find().map(function(slot, j){
                     return !this.state.crafted || (this.state.crafted && slot.id >= 9) ? (
                       <li onClick={op.cb.bind(this, slot)} key={j}>
-                        <a href="#">{slot.id == 4 || slot.id == 6 ? 'L. ' : ''} {slot.id == 5 || slot.id == 7 ? 'R. ' : ''} {slot.name}</a>
+                        <a href="#">{slot.id == 4 || slot.id == 6 ? 'L. ' : ''} {slot.id == 5 || slot.id == 7 ? 'R. ' : ''} {slot.slot}</a>
                       </li>
                     ) : '';
                   }.bind(this))}
@@ -173,22 +171,20 @@ Slot = ReactMeteor.createClass({
   },
 
   onSelectSearch: function(item) {
-    this.reset();
     Slots.update({ _id: this.props._id }, { $set: { itemName: item.itemname } });
-    _.range(0,10).map(function(i){
-      var from = item.dropitem[i];
-      var to = this.refs['bonus' + i];
-      if(from){
-        from.amount = parseInt(from.amount, 10);
-        if(to) to.setState(from);
+    Bonuses.find({ slotid: this.props._id }).map(function(bonus){
+      var itembonus = item.dropitem[bonus.index];
+      if(itembonus){
+        itembonus.amount = parseInt(itembonus.amount, 10);
       } else {
-        if(to) to.setState(GetDefaultBonus(this.props._id, i));
+        itembonus = GetDefaultBonus(this.props._id, bonus.index);
       }
+      Bonuses.update({ _id: bonus._id }, { $set: itembonus });
     }.bind(this));
   },
 
   onClickEnhanced: function(e) {
-    this.props.onClickEnhanceItem(this.props._id);
+    this.props.onClickEnhanceItem();
   }
 
 });

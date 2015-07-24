@@ -19,7 +19,7 @@ ReportGb = ReactMeteor.createClass({
   },
 
   'Resist': function(effect) {
-    var racial = GetRacialResist(this.state.character.realm, this.state.character.race, effect);
+    var racial = GetRacialResist(this.state.template.realm, this.state.template.race, effect);
     return <div>{effect} Resist : {this.state.totals['Resist ' + effect]}</div>;
   },
 
@@ -39,10 +39,10 @@ ReportGb = ReactMeteor.createClass({
     return (
       <div>
         <p>DAOC Spellcraft Template Report</p>
-        <p>Configuration Name : {this.state.character.name}</p>
-        <p>Character Class : ({this.state.character.realm}) {this.state.character.class}</p>
-        <p>Character Level : {this.state.character.level}</p>
-        <p>Race : {this.state.character.race}</p>
+        <p>Configuration Name : {this.state.template.name}</p>
+        <p>template Class : ({this.state.template.realm}) {this.state.template.class}</p>
+        <p>template Level : {this.state.template.level}</p>
+        <p>Race : {this.state.template.race}</p>
         <br/>
         <p>&lt;-- Stats --&gt;</p>
         {BonusStat.map(this.output.bind(this, 'Stat'))}
@@ -66,7 +66,7 @@ ReportGb = ReactMeteor.createClass({
           if(bonuses.count()){
             return (
               <div key={i}>
-                <p>( {slot.name} ) : {slot.crafted ? slot.craftedItemName : slot.itemName}</p>
+                <p>( {slot.slot} ) : {slot.crafted ? slot.craftedItemName : slot.itemName}</p>
                 {bonuses.map(function(bonus, i){
                   return <p key={i}>{bonus.amount} {bonus.effect} {bonus.type == 'Cap Increase' ? 'Cap' : ''}</p>;
                 })}
