@@ -1,27 +1,27 @@
-EnhancedBonus = ReactMeteor.createClass({
+EnhancedBonus = React.createClass({
 
-  templateName: 'EnhancedBonus',
+  mixins: [ReactMeteorData],
 
-  getMeteorState: function() {
+  getMeteorData: function() {
     return Bonuses.findOne({ _id: this.props._id });
   },
 
   render: function() {
     return (
-      <div className="row bonus enhanced" style={{ display: this.state.amount ? 'block' : 'none' }}>
+      <div className="row bonus enhanced" style={{ display: this.data.amount ? 'block' : 'none' }}>
         <div className="col-xs-3">
           <select name="type">
-            <option>{this.state.type}</option>
+            <option>{this.data.type}</option>
           </select>
         </div>
         <div className="col-xs-3">
           <select name="effect">
-            <option>{this.state.effect}</option>
+            <option>{this.data.effect}</option>
           </select>
         </div>
         <div className="col-xs-2">
           <select name="type">
-            <option>{this.state.amount}</option>
+            <option>{this.data.amount}</option>
           </select>
         </div>
       </div>

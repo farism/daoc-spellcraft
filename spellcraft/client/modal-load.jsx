@@ -1,24 +1,29 @@
-ModalLoad = ReactMeteor.createClass({
+ModalLoad = React.createClass({
 
-  templateName: 'ModalLoad',
-
-  mixins: [React.addons.LinkedStateMixin],
+  mixins: [ReactMeteorData, React.addons.LinkedStateMixin],
 
   getInitialState: function() {
     return {
-      selected: -1,
+      userOnly: Boolean(Cookie.get('userOnly')),
+      selected: null,
       cb: function(){}
     }
   },
 
-  getMeteorState: function() {
+  getMeteorData: function() {
     var select = {};
-    if(this.state.user) select['ownerId'] = Meteor.userId();
-    if(this.state.class) select['character.class'] = { $regex: '^' + this.state.class + '.*', $options: 'i' };
-    if(this.state.level) select['character.level'] = parseInt(this.state.level);
+    var userid = Meteor.userId();
+    if(this.state.userOnly) select['owner'] = userid;
+    if(this.state.class) select['class'] = { $regex: '^' + this.state.class + '.*', $options: 'i' };
+    if(this.state.level) select['level'] = parseInt(this.state.level);
 
     return {
-      templates: Templates.find(select).fetch()
+      templates: Templates.find(select, {
+        transform: function(doc){
+          doc.favorite = Favorites.find({ user: userid, template: doc._id }).count();
+          return doc;
+        }
+      }).fetch()
     }
   },
 
@@ -27,6 +32,9 @@ ModalLoad = ReactMeteor.createClass({
   },
 
   render: function() {
+    var userid = Meteor.userId();
+    var template = Templates.findOne({ _id: this.state.selected }) || {};
+
     return (
       <div ref="modal" id="modal-load" className="modal fade">
         <div className="modal-dialog">
@@ -45,7 +53,7 @@ ModalLoad = ReactMeteor.createClass({
                 </div>
                 {Meteor.userId() ? (
                   <div className="col-xs-4">
-                    <label><input type="checkbox" checkedLink={this.linkState('user')} />My Templates</label>
+                    <label><input type="checkbox" checked={this.state.userOnly} onChange={this.onChangeUserOnly} />My Templates</label>
                   </div>
                 ) : ''}
               </div>
@@ -57,18 +65,27 @@ ModalLoad = ReactMeteor.createClass({
                     <th width="25%">Level</th>
                     <th width="25%">Class</th>
                   </tr>
-                  {this.state.templates.map(function(template, i) {
+                  {this.data.templates.map(function(template, i) {
                     var _id = template._id;
                     return (
                       <tr className={this.state.selected == _id ? 'selected' : ''} onClick={this.onClick.bind(this, _id)}  onDoubleClick={this.onDoubleClick.bind(this, _id)} key={i}>
-                        <td>{template.name}</td>
-                        <td>{template.character.level}</td>
-                        <td>{template.character.class}</td>
+                        <td>{template.name} {template.favorite ? <span className="glyphicon glyphicon-heart" /> : ''}</td>
+                        <td>{template.level}</td>
+                        <td>{template.class}</td>
                       </tr>
                     );
                   }.bind(this))}
                 </tbody>
               </table>
+            </div>
+            <div className="modal-footer">
+              {this.state.selected && (template.owner == userid) ? (
+                <button type="button" className="pull-left btn btn-danger" onClick={this.onClickDelete}>Delete Selected</button>
+              ) : ''}
+              {this.state.selected ? (
+                <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onClickLoad}>Load Selected</button>
+              ) : ''}
+              <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -76,17 +93,33 @@ ModalLoad = ReactMeteor.createClass({
     );
   },
 
+  onChangeUserOnly: function(e) {
+    Cookie.set('userOnly', e.target.checked);
+    this.setState({ userOnly: e.target.checked });
+  },
+
   onClick: function(_id) {
     this.setState({ selected: _id });
   },
 
   onDoubleClick: function(_id) {
-    Router.go('/spellcraft/edit/' + _id);
+    FlowRouter.go('/spellcraft/edit/' + _id);
     this.hide();
   },
 
+  onClickDelete: function() {
+    if(confirm('Are you sure you want to delete this template?')){
+      Templates.remove({ _id: this.state.selected });
+      this.setState({ selected: null });
+    }
+  },
+
+  onClickLoad: function() {
+    FlowRouter.go('/spellcraft/edit/' + this.state.selected);
+  },
+
   show: function(cb) {
-    this.setState({ selected: -1, cb: cb || function(){} });
+    this.setState({ selected: null, cb: cb || function(){} });
     $(this.getDOMNode()).modal('show');
   },
 

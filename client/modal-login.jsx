@@ -1,6 +1,4 @@
-ModalLogin = ReactMeteor.createClass({
-
-  templateName: 'ModalLogin',
+ModalLogin = React.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 
@@ -11,21 +9,8 @@ ModalLogin = ReactMeteor.createClass({
     }
   },
 
-  getMeteorState: function() {
-    return {
-      user: Meteor.user(),
-      loggingIn: Meteor.loggingIn()
-    }
-  },
-
   componentDidMount: function() {
     $(React.findDOMNode(this.refs.modal)).modal({ show: false });
-  },
-
-  componentDidUpdate: function() {
-    if(this.state.user){
-      this.hide();
-    }
   },
 
   render: function() {
@@ -36,9 +21,9 @@ ModalLogin = ReactMeteor.createClass({
       title = 'Login';
       body = (
         <div className="clearfix">
-          <input type="email" placeholder="Email" required valueLink={this.linkState('login_email')} />
-          <input type="password" placeholder="Password" required valueLink={this.linkState('login_password')} onKeyDown={this.onKeyDown} />
-          <button type="button" className="btn btn-default pull-right" disabled={this.state.loggingIn} onClick={this.onClickSubmit}>Login</button>
+          <input type="email" placeholder="Email" valueLink={this.linkState('login_email')} />
+          <input type="password" placeholder="Password" valueLink={this.linkState('login_password')} onKeyDown={this.onKeyDown} />
+          <button type="button" className="btn btn-default pull-right" onClick={this.onClickSubmit}>Login</button>
         </div>
       );
     } else if(this.state.view == 1){
@@ -50,12 +35,12 @@ ModalLogin = ReactMeteor.createClass({
         </div>
       );
     } else if(this.state.view == 2){
-      title = 'Register'
+      title = 'Register';
       body = (
         <div className="clearfix">
-          <input type="email" placeholder="Email" required valueLink={this.linkState('register_email')} />
-          <input type="password" placeholder="Password" required valueLink={this.linkState('register_password')} />
-          <input type="password" placeholder="Confirm Password" required valueLink={this.linkState('register_password_2')} onKeyDown={this.onKeyDown} />
+          <input type="email" placeholder="Email" valueLink={this.linkState('register_email')} />
+          <input type="password" placeholder="Password" valueLink={this.linkState('register_password')} />
+          <input type="password" placeholder="Confirm Password" valueLink={this.linkState('register_password_2')} onKeyDown={this.onKeyDown} />
           <button type="button" className="btn btn-default pull-right" onClick={this.onClickSubmit}>Register</button>
         </div>
       );
@@ -84,7 +69,7 @@ ModalLogin = ReactMeteor.createClass({
   },
 
   onClickToggleView: function(i, e) {
-    this.replaceState({ view: i });
+    this.replaceState({ view: i, cb: this.state.cb });
   },
 
   onClickSubmit: function(e) {
@@ -93,8 +78,8 @@ ModalLogin = ReactMeteor.createClass({
         if(err){
           alert(err.reason);
         } else {
-          this.state.cb();
           this.hide();
+          this.state.cb();
         }
       }.bind(this));
     }
@@ -117,8 +102,8 @@ ModalLogin = ReactMeteor.createClass({
         if(err){
           alert(err.reason);
         } else {
-          this.setState({ register_email: '', register_password: '', register_password_2: '' });
           this.hide();
+          this.state.cb();
         }
       }.bind(this));
     }

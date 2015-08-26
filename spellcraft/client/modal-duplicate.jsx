@@ -1,6 +1,4 @@
-ModalDuplicate = ReactMeteor.createClass({
-
-  templateName: 'ModalDuplicate',
+ModalDuplicate = React.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 

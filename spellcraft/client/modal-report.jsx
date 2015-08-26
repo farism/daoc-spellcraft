@@ -1,19 +1,23 @@
-ModalReport = ReactMeteor.createClass({
-
-  templateName: 'ModalReport',
+ModalReport = React.createClass({
 
   mixins: [React.addons.LinkedStateMixin],
 
   getInitialState: function() {
     return {
-      style: 0,
+      style: parseInt(Cookie.get('reportstyle'), 10) || 0,
+      expand: Boolean(Cookie.get('expandreport')) || false,
       visible: false,
-      expand: false
     }
   },
 
   componentDidMount: function() {
-    $(React.findDOMNode(this.refs.modal)).modal({ show: false });
+    $(React.findDOMNode(this.refs.modal)).modal({ show: false }).on('hidden.bs.modal', function(){
+      this.setState({ visible: false });
+    }.bind(this));
+
+    ZeroClipboard.config({ swfPath: '/ZeroClipboard.swf' });
+    this.client = new ZeroClipboard();
+    this.client.clip(React.findDOMNode(this.refs.clip));
   },
 
   render: function() {
@@ -29,7 +33,7 @@ ModalReport = ReactMeteor.createClass({
               <label><input type="radio" name="style" value="0" checked={this.state.style == 0} onChange={this.onChangeStyle} />GearBunny</label>
               <label><input type="radio" name="style" value="1" checked={this.state.style == 1} onChange={this.onChangeStyle} />LOKI</label>
               <label><input type="radio" name="style" value="2" checked={this.state.style == 2} onChange={this.onChangeStyle} />Korts</label>
-              <label><input type="checkbox" checkedLink={this.linkState('expand')}/>Expand dropped bonuses</label>
+              <label><input type="checkbox" checked={this.state.expand} onChange={this.onChangeExpand} />Expand dropped bonuses</label>
               <br/>
               <ul className="nav nav-tabs">
                 <li className="active"><a href="#item" data-toggle="tab">Item Report</a></li>
@@ -38,7 +42,13 @@ ModalReport = ReactMeteor.createClass({
               <div className="tab-content">
                 <div className="tab-pane active" id="item">
                   <br/>
-                  {this.displayReport()}
+                  <a ref="clip" className="btn btn-default" onMouseOver={this.onHoverClipboard}>Copy to Clipboard</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <a ref="save" className="btn btn-default" onMouseOver={this.onHoverSave}>Save as txt</a>
+                  <br/>
+                  <br/>
+                  <div ref="report">
+                    {this.displayReport()}
+                  </div>
                 </div>
                 <div className="tab-pane" id="craft">
                   {this.displayReportCrafting()}
@@ -63,17 +73,34 @@ ModalReport = ReactMeteor.createClass({
 
   onChangeStyle: function(e){
     var val = parseInt($(e.target).val(), 10);
+    Cookie.set('reportstyle', val);
     this.setState({ style: val });
+  },
+
+  onChangeExpand: function(e){
+    Cookie.set('expandreport', e.target.checked);
+    this.setState({ expand: e.target.checked });
+  },
+
+  onHoverClipboard: function() {
+    this.client.setText(GetInnerText(React.findDOMNode(this.refs.report)));
+  },
+
+  onHoverSave: function() {
+    var a = React.findDOMNode(this.refs.save);
+    var file = new Blob([GetInnerText(React.findDOMNode(this.refs.report))], { type: 'text/plain' });
+    a.href = URL.createObjectURL(file);
+    a.download = (Session.get('name') || 'template') + '.txt';
   },
 
   displayReport: function() {
     if(this.state.visible){
       if(this.state.style == 0){
-        return <ReportGb expand={this.state.expand} />
+        return <ReportGb {...this.props} expand={this.state.expand} />
       } else if(this.state.style == 1){
-        return <ReportLoki expand={this.state.expand} />
+        return <ReportLoki {...this.props} expand={this.state.expand} />
       } else if(this.state.style == 2){
-        return <ReportKorts expand={this.state.expand} />
+        return <ReportKorts {...this.props} expand={this.state.expand} />
       }
     }
 
@@ -82,7 +109,7 @@ ModalReport = ReactMeteor.createClass({
 
   displayReportCrafting: function(){
     if(this.state.visible){
-      return <ReportCrafting />
+      return <ReportCrafting {...this.props} />
     }
   }
 

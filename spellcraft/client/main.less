@@ -6,7 +6,6 @@
 .clear { clear:both; }
 .clearfix { .clearfix(); }
 
-html { overflow-y:scroll; }
 body { padding-bottom:40px; }
 
 #actions { margin-bottom:5px; font-size:18px;
@@ -96,9 +95,17 @@ body { padding-bottom:40px; }
   .btn { float:right; }
 }
 
+#modal-enhanced {
+  .tier-0 { background:rgb(255,255,255); }
+  .tier-1 { background:rgb(235,235,235); }
+  .tier-2 { background:rgb(215,215,215); }
+  .tier-3 { background:rgb(195,195,195); }
+  .tier-4 { background:rgb(175,175,175); }
+}
+
 #modal-load, #modal-enhanced {
   table { width:100%; }
-  td { border:1px solid #ccc; }
+  td { border:1px solid #000; }
   tr { cursor:pointer; user-select:none; }
   th, td { padding:5px; }
   .selected { background:#000; color:#fff; }
@@ -120,6 +127,12 @@ input[type="text"], input[type="number"] { padding:0 5px; }
 input[type="number"] { line-height:20px; }
 input[name="search"] { width:250px; }
 input[name="level"] { width:65px; }
+
+.btn-default.zeroclipboard-is-hover { color:#333; background-color:#e6e6e6; border-color: #adadad; }
+
+.modal-open {
+  .modal { overflow-y:scroll; }
+}
 
 .navbar { border-radius:0; border-left:0; border-right:0; }
 

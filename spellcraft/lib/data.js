@@ -52,7 +52,8 @@ BonusTypes = [
   'Skill',
   'Cap Increase',
   'Other Bonus',
-  'Focus'
+  'Mythical',
+  'PvE'
 ];
 
 FifthSlotBonusTypes = [
@@ -135,6 +136,43 @@ BonusResist = [
 
 BonusResistSearch = BonusResist.map(function(a){ return a + ' Resist' });
 
+BonusMythical = [
+  'Encumbrance',
+  'Essence Resist',
+  'Coin',
+  'Resurrection',
+  'Safe Fall',
+  'Arrow Recovery',
+  'Realm Point',
+  'Parry',
+  'Evade',
+  'Block',
+  'Siege Damage Ablative',
+  'Spell Increase',
+  'Crowd Control Reduction',
+  'DPS',
+  'Physical Defense',
+  'Health Regen',
+  'Power Regen',
+  'Siege Speed',
+  'Endurance Regen'
+];
+
+BonusPvE = [
+  'Bladeturn Reinforcement',
+  'Spell Power Cost',
+  'Parry',
+  'Evade',
+  'Blocking',
+  'Negative Effect Duration',
+  'Parry',
+  'Piece Ablative',
+  'Reactionary Style Damage',
+  'Style Cost Reduction',
+  'To-Hit Bonus',
+  'Concentration'
+];
+
 BonusSkill = [
   'Shield',
   'All Spell Lines',
@@ -148,7 +186,9 @@ BonusEffectsMap = {
   'Other Bonus': BonusOther,
   'Stat': BonusStat,
   'Cap Increase': BonusStatCap,
-  'Resist': BonusResist
+  'Resist': BonusResist,
+  'Mythical': BonusMythical,
+  'PvE': BonusPvE,
 };
 
 JewelSlots = [

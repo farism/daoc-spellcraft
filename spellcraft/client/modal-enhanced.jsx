@@ -1,22 +1,22 @@
-ModalEnhanced = ReactMeteor.createClass({
+var tiers = ['Cloth','Leather','Studded','Chain','Plate'];
 
-  templateName: 'EnhancedModal',
+ModalEnhanced = React.createClass({
 
   getInitialState: function() {
     return {
-      selected: -1
+      selected: null,
+      gear: GetEnhancedBonusesBySlot(this.props.meta.realm, this.props.meta.class, this.props.slot.id)
     }
-  },
-
-  getMeteorState: function() {
-    var template = Session.get('template');
-    return {
-      gear: GetEnhancedBonusesBySlot(template.realm, template.class, this.props.slot.id)
-    };
   },
 
   componentDidMount: function() {
     $(React.findDOMNode(this.refs.modal)).modal({ show: false });
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      gear: GetEnhancedBonusesBySlot(nextProps.meta.realm, nextProps.meta.class, nextProps.slot.id)
+    })
   },
 
   render: function() {
@@ -37,7 +37,8 @@ ModalEnhanced = ReactMeteor.createClass({
                   </tr>
                   {this.state.gear.map(function(gear, i){
                     return (
-                      <tr className={this.state.selected == i ? 'selected' : ''} onClick={this.onClick.bind(this, i)} onDoubleClick={this.onDoubleClick.bind(this, i)} key={i}>
+                      <tr className={('tier-' + gear.tier) + (i == this.state.selected ? ' selected' : '')} onClick={this.onClick.bind(this, i)} onDoubleClick={this.onDoubleClick.bind(this, i)} key={i}>
+                        <td>{tiers[gear.tier]}</td>
                         <td>{gear.name}</td>
                         <td>{gear.value}</td>
                       </tr>
@@ -47,7 +48,9 @@ ModalEnhanced = ReactMeteor.createClass({
               </table>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onClickUse}>Use Selected</button>
+              {this.state.selected ? (
+                <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onClickUse}>Use Selected</button>
+              ) : ''}
               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>
@@ -57,12 +60,12 @@ ModalEnhanced = ReactMeteor.createClass({
   },
 
   show: function() {
+    this.setState({ selected: null });
     $(this.getDOMNode()).modal('show');
   },
 
   hide: function() {
     $(this.getDOMNode()).modal('hide');
-    this.setState({ selected: -1 });
   },
 
   onClick: function(i, e){

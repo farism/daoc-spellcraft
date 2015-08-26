@@ -6,9 +6,7 @@
 
 meteor-platform
 insecure
-iron:router
 twbs:bootstrap
-reactjs:react
 maxharris9:classnames
 waitingkuo:normalize
 flemay:less-autoprefixer
@@ -19,3 +17,8 @@ accounts-ui
 accounts-password
 dataflows:immutable
 meteorhacks:fast-render
+copleykj:tagstripper
+react
+meteorhacks:flow-router
+reactive-var
+chuangbo:cookie

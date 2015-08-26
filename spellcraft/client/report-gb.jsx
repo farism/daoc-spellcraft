@@ -1,48 +1,46 @@
-ReportGb = ReactMeteor.createClass({
-
-  templateName: 'ReportGb',
-
-  mixins: [ReportMixin],
+ReportGb = React.createClass({
 
   getDefaultProps: function() {
     return {
-      expand: false
+      expand: false,
+      totals: {},
+      meta: {}
     }
   },
 
-  'Stat': function(effect) {
-    return <div>{effect} : {this.state.totals['Stat ' + effect]} / {this.getCeiling('Stat', effect)}</div>;
+  'Stat': function(effect, i) {
+    return <div key={i}>{effect} : {this.props.totals['Stat ' + effect]} / {GetCeiling(this.props.totals, this.props.meta.level, 'Stat', effect)}</div>;
   },
 
-  'Cap Increase': function(effect) {
-    return <div>{effect} Cap : {this.state.totals['Cap Increase ' + effect]} / {this.getCeiling('Cap Increase', effect)}</div>;
+  'Cap Increase': function(effect, i) {
+    return <div key={i}>{effect} Cap : {this.props.totals['Cap Increase ' + effect]} / {GetCeiling(this.props.totals, this.props.meta.level, 'Cap Increase', effect)}</div>;
   },
 
-  'Resist': function(effect) {
-    var racial = GetRacialResist(this.state.template.realm, this.state.template.race, effect);
-    return <div>{effect} Resist : {this.state.totals['Resist ' + effect]}</div>;
+  'Resist': function(effect, i) {
+    var racial = GetRacialResist(this.props.meta.realm, this.props.meta.race, effect);
+    return <div key={i}>{effect} Resist : {this.props.totals['Resist ' + effect]} / {GetCeiling(this.props.totals, this.props.meta.level, 'Resist', effect)}</div>;
   },
 
-  'Other Bonus': function(effect) {
-    return <div>{effect} : {this.state.totals['Other Bonus ' + effect]}</div>;
+  'Other Bonus': function(effect, i) {
+    return <div key={i}>{effect} : {this.props.totals['Other Bonus ' + effect]} / {GetCeiling(this.props.totals, this.props.meta.level, 'Other Bonus', effect)}</div>;
   },
 
-  'Skill': function(effect) {
-    return <div>{effect} : {this.state.totals['Skill ' + effect]}</div>;
+  'Skill': function(effect, i) {
+    return <div key={i}>{effect} : {this.props.totals['Skill ' + effect]} / {GetCeiling(this.props.totals, this.props.meta.level, 'Skill', effect)}</div>;
   },
 
-  output: function(type, effect){
-    return this.state.totals[type + ' ' + effect] ? this[type](effect) : '';
+  output: function(type, effect, i){
+    return this.props.totals[type + ' ' + effect] ? this[type](effect, i) : '';
   },
 
   render: function() {
     return (
       <div>
-        <p>DAOC Spellcraft Template Report</p>
-        <p>Configuration Name : {this.state.template.name}</p>
-        <p>template Class : ({this.state.template.realm}) {this.state.template.class}</p>
-        <p>template Level : {this.state.template.level}</p>
-        <p>Race : {this.state.template.race}</p>
+        <p>daocspellcraft.com Template Report</p>
+        <p>Configuration Name : {this.props.meta.name}</p>
+        <p>Class : ({this.props.meta.realm}) {this.props.meta.class}</p>
+        <p>Level : {this.props.meta.level}</p>
+        <p>Race : {this.props.meta.race}</p>
         <br/>
         <p>&lt;-- Stats --&gt;</p>
         {BonusStat.map(this.output.bind(this, 'Stat'))}
@@ -57,19 +55,26 @@ ReportGb = ReactMeteor.createClass({
         {BonusOther.map(this.output.bind(this, 'Other Bonus'))}
         <br/>
         <p>&lt;-- Skills --&gt;</p>
-        {this.state.skills.map(this.output.bind(this, 'Skill'))}
+        {this.props.skills.map(this.output.bind(this, 'Skill'))}
         <br/>
         <p>&lt;== Equipment Info ==&gt;</p>
         <br/>
         {Slots.find().map(function(slot, i){
-          var bonuses = Bonuses.find({ slotid: slot._id, amount: { $gt: 0 } });
-          if(bonuses.count()){
+          var bonuses = Bonuses.find({ slotid: slot.id, amount: { $gt: 0 } }).fetch();
+          if(bonuses.length){
             return (
               <div key={i}>
                 <p>( {slot.slot} ) : {slot.crafted ? slot.craftedItemName : slot.itemName}</p>
                 {bonuses.map(function(bonus, i){
-                  return <p key={i}>{bonus.amount} {bonus.effect} {bonus.type == 'Cap Increase' ? 'Cap' : ''}</p>;
-                })}
+                  var effectSuffix = bonus.type == 'Cap Increase' ? '(Cap Increase)' : '';
+                  var amountSuffix = bonus.type == 'Resist' ? '%' : '';
+                  var gem = GetGemName(bonus.type, bonus.effect, bonus.amountIndex);
+                  if(slot.crafted){
+                    return <p key={i}>{bonus.effect} {effectSuffix}: {bonus.amount}{amountSuffix} ( {gem} )</p>;
+                  } else if(this.props.expand){
+                    return <p key={i}>{bonus.effect} {effectSuffix}: {bonus.amount}{amountSuffix}</p>;
+                  }
+                }.bind(this))}
                 <br />
               </div>
             );
