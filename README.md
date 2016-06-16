@@ -2,5 +2,5 @@
 
 Install [Meteor](https://www.meteor.com/)
 clone project
-cd into project directory
+cd into project director
 run command `meteor`
